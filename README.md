@@ -21,11 +21,12 @@ Autor
 * Ing. Katherine E. Aguirre
 <br>
 <br>
-<p style="color:#ff9900"><i class="fas fa-exclamation-triangle"></i>&nbsp;Advertencia:</p>
+<p><i class="fas fa-exclamation-triangle" style="color:#ff9900"></i>&nbsp;&nbsp;Advertencia:</p>
 
 Se hacen las siguientes presunciones:
 
-* El cliente donde se va a configurar el *replicaset* ya posee instalado y configurado *Docker* como contenedor de imágenes.
+* <i class="fab fa-docker" style="color:blue"></i> El cliente donde se va a configurar el *replicaset* ya posee instalado y configurado *Docker* como contenedor de imágenes.
+* <i class="far fa-hand-paper" style="color:red"></i> NO SE UTILIZA **docker-compose** EN ESTE PROYECTO
 
 ---
 
@@ -33,26 +34,16 @@ Se hacen las siguientes presunciones:
 
 Esta implementación se realizará con Docker Run, de esta manera quedarán los volumenens
 
-1. Descargar los archivos de configuración:
+1. Clonar el respositorio
 
-* >wget https://raw.githubusercontent.com/kathemica/mongodb-replicaset/main/files/configScript.sh
+> git clone https://github.com/kathemica/mongodb-replicaset.git
 
-* >wget https://raw.githubusercontent.com/kathemica/mongodb-replicaset/main/files/serverCluster.conf
-
-* >wget https://raw.githubusercontent.com/kathemica/mongodb-replicaset/main/files/server_root_CA.cnf
-
-
-2. creamos una carpeta llamada *config*:
-> mkdir config
-
-3. Movemos el archivo *serverCluster.conf* y *server_root_CA.cnf* en *config*:
-> mv serverCluster.conf server_root_CA.cnf config/
-
-3. Le damos atributo de ejecutable al script:
+2. Le damos atributo de ejecutable al script:
 > sudo chmod -w configScript.sh
 
-4. Luego ejecutamos el script:
+3. Luego ejecutamos el script para generar los certificados:
 > sudo sh configScript.sh
+
 
 
 
