@@ -38,6 +38,10 @@ Esta implementación se realizará con Docker Run, de esta manera quedarán los 
 
 > git clone https://github.com/kathemica/mongodb-replicaset.git
 
+2. Ir a la carpeta mongodb-replicaset/
+
+>  cd mongodb-replicaset/
+
 2. Le damos atributo de ejecutable al script:
 > sudo chmod -w configScript.sh
 
@@ -45,8 +49,22 @@ Esta implementación se realizará con Docker Run, de esta manera quedarán los 
 > sudo sh configScript.sh
 
 
+Una vez configurado todo el sistema de certificaciones procedemos a levantar las instancias:
 
-
+sudo docker run --name MGDB_replica01 \
+-p 27017:27017 \
+--net=host \
+--restart always \
+-e "TZ=America/Argentina/Buenos_Aires" \
+-e MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=1' \
+-v $(pwd)/replica01/data:/data/db \
+-v $(pwd)/replica01/ssl:/data/ssl \
+-v $(pwd)/config:/data/config \
+-e MONGO_INITDB_ROOT_USERNAME=mdb_admin \
+-e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \
+mongo:4.4.4-bionic \
+mongod --replSet my-mongo-set \
+mongod --config /data/config/serverCluster.conf
 
 ---
 
