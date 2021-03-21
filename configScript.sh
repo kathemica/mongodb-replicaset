@@ -103,7 +103,7 @@ gen_replicakeycerts(){
     printf "\nFINISHED $1 $logText\n"
 }
 
-openssl rand -out /home/ubuntu/.rnd -hex 256
+openssl rand -out .rnd -hex 256
 printf "STARTING SCRIPT $logText\n\n"
 
 openssl genrsa -des3 -out $MDB_CA_KEY -passout pass:"$MDB_PASS_PHRASE_CA" 4096
