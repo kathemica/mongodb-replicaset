@@ -35,21 +35,24 @@ Esta implementación se realizará con Docker Run, de esta manera quedarán los 
 
 1. Descargar los archivos de configuración:
 
-* >wget https://raw.githubusercontent.com/kathemica/mongodb-replicaset/main/code/generarEstructura.sh
+* >wget https://raw.githubusercontent.com/kathemica/mongodb-replicaset/main/files/configScript.sh
 
-* >wget https://raw.githubusercontent.com/kathemica/mongodb-replicaset/main/code/serverCluster.conf
+* >wget https://raw.githubusercontent.com/kathemica/mongodb-replicaset/main/files/serverCluster.conf
 
-2. creamos una carpeta llamada *conf*:
-> mkdir conf
+* >wget https://raw.githubusercontent.com/kathemica/mongodb-replicaset/main/files/server_root_CA.cnf
 
-3. Copiamos el archivo *serverCluster.conf* en *conf*:
-> cp serverCluster.conf conf/
+
+2. creamos una carpeta llamada *config*:
+> mkdir config
+
+3. Movemos el archivo *serverCluster.conf* y *server_root_CA.cnf* en *config*:
+> mv serverCluster.conf server_root_CA.cnf config/
 
 3. Le damos atributo de ejecutable al script:
-> sudo chmod -w generarEstructura.sh
+> sudo chmod -w configScript.sh
 
 4. Luego ejecutamos el script:
-> sudo sh generarEstructura.sh
+> sudo sh configScript.sh
 
 
 

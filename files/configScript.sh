@@ -1,6 +1,6 @@
 #!/bin/sh
 logText=" ----- "
-CONFS_FILES_DIR="./confs/"
+CONFS_FILES_DIR="./config/"
 
 #-------------------------------------------------------------------
 # the paths must match in docker-compose.yml file
@@ -32,10 +32,10 @@ MDB_NODE_ARB_CNF="${CONFS_FILES_DIR}mdb_replicaarbiter_CN.cnf"
 #-------------------------------------------------------------------
 # must match the file name of cluster.conf
 MDB_CA_DIR="CA"
-MDB_CA_KEY="mdb_root_CA.key"
-MDB_CA_CRT="mdb_root_CA.crt"
-MDB_CA_SRL="mdb_root_CA.srl"
-MDB_CA_CNF="${CONFS_FILES_DIR}mdb_root_CA.cnf"
+MDB_CA_KEY="server_root_CA.key"
+MDB_CA_CRT="server_root_CA.crt"
+MDB_CA_SRL="server_root_CA.srl"
+MDB_CA_CNF="${CONFS_FILES_DIR}server_root_CA.cnf"
 MDB_PASS_PHRASE_CA="b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS0wMi0xOSIsInBhaWRVcFRvIjoiMjAyMi0wMi0"
 
 #-------------------------------------------------------------------
@@ -103,7 +103,7 @@ gen_replicakeycerts(){
     printf "\nFINISHED $1 $logText\n"
 }
 
-openssl rand -writerand .rnd
+openssl rand -out /home/ubuntu/.rnd -hex 256
 printf "STARTING SCRIPT $logText\n\n"
 
 openssl genrsa -des3 -out $MDB_CA_KEY -passout pass:"$MDB_PASS_PHRASE_CA" 4096
