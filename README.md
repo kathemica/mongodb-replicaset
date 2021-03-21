@@ -33,6 +33,16 @@ Se hacen las siguientes presunciones:
 
 Esta implementación se realizará con Docker Run, de esta manera quedarán los volumenens
 
+Descargar el script de configuración:
+
+>wget https://raw.githubusercontent.com/kathemica/mongodb-replicaset/main/code/generarEstructura.sh
+
+Le damos atributo de ejecutable 
+>sudo chmod -w generarEstructura.sh
+
+Luego lo ejecutamos
+>sudo sh generarEstructura.sh
+
 
 
 

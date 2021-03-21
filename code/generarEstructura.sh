@@ -5,29 +5,29 @@ CONFS_FILES_DIR="./confs/"
 #Part 01 -------------------------------------------------------------------
 # the paths must match in docker-compose.yml file
 # must match the file name of cluster.conf
-ServerNode01_DIR="node_1"
-ServerNode01_KEY="mdb_node_1.key"
-ServerNode01_CSR="mdb_node_1.csr"
-ServerNode01_CRT="mdb_node_1.crt"
+ServerNode01_DIR="replica01"
+ServerNode01_KEY="mdb_replica01.key"
+ServerNode01_CSR="mdb_replica01.csr"
+ServerNode01_CRT="mdb_replica01.crt"
 ServerNode01_CNF="${CONFS_FILES_DIR}ServerNode01_CN.cnf"
 
 #Part 02 -------------------------------------------------------------------
 # the paths must match in docker-compose.yml file
 # must match the file name of cluster.conf
-ServerNode02_DIR="node_2"
-ServerNode02_KEY="mdb_node_2.key"
-ServerNode02_CSR="mdb_node_2.csr"
-ServerNode02_CRT="mdb_node_2.crt"
+ServerNode02_DIR="replica02"
+ServerNode02_KEY="mdb_replica02.key"
+ServerNode02_CSR="mdb_replica02.csr"
+ServerNode02_CRT="mdb_replica02.crt"
 ServerNode02_CNF="${CONFS_FILES_DIR}ServerNode02_CN.cnf"
 
 #Part 03 -------------------------------------------------------------------
 # the paths must match in docker-compose.yml file
 # must match the file name of cluster.conf
-MDB_NODE_ARB_DIR="node_arbiter"
-MDB_NODE_ARB_KEY="mdb_node_arbiter.key"
-MDB_NODE_ARB_CSR="mdb_node_arbiter.csr"
-MDB_NODE_ARB_CRT="mdb_node_arbiter.crt"
-MDB_NODE_ARB_CNF="${CONFS_FILES_DIR}mdb_node_arbiter_CN.cnf"
+MDB_NODE_ARB_DIR="replicaarbiter"
+MDB_NODE_ARB_KEY="mdb_replicaarbiter.key"
+MDB_NODE_ARB_CSR="mdb_replicaarbiter.csr"
+MDB_NODE_ARB_CRT="mdb_replicaarbiter.crt"
+MDB_NODE_ARB_CNF="${CONFS_FILES_DIR}mdb_replicaarbiter_CN.cnf"
 
 #Part 04 -------------------------------------------------------------------
 # must match the file name of cluster.conf
@@ -36,7 +36,7 @@ MDB_CA_KEY="mdb_root_CA.key"
 MDB_CA_CRT="mdb_root_CA.crt"
 MDB_CA_SRL="mdb_root_CA.srl"
 MDB_CA_CNF="${CONFS_FILES_DIR}mdb_root_CA.cnf"
-MDB_PASS_PHRASE_CA="mdb_my_custom_passphrase_security"
+MDB_PASS_PHRASE_CA="b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS0wMi0xOSIsInBhaWRVcFRvIjoiMjAyMi0wMi0"
 
 #Part 05 -------------------------------------------------------------------
 # must match the file name of cluster.conf
@@ -71,7 +71,7 @@ cp ./$2 ./$1/$2
 # MDB CA .crt file  ----- $5 - $MDB_CA_CRT
 # MDB CA .key file  ----- $6 - $MDB_CA_KEY
 # NODE .crt file  ----- $7 - $MDB_NODEX_CRT
-gen_node_keycerts(){
+gen_replicakeycerts(){
 printf "\nSTARTING $1 Certificates $logText \n"
 mkdir $1 2> /dev/null
 printf "Generating $1 - KEY and CSR files $logText\n"
@@ -99,9 +99,9 @@ openssl req -x509 -new -key $MDB_CA_KEY -sha256 -passin pass:"$MDB_PASS_PHRASE_C
 printf "Root CA crt OK $logText \n"
 printf "FINISHED CA CERTIFICATE $logText \n"
 
-gen_node_keycerts $ServerNode01_DIR $ServerNode01_KEY $ServerNode01_CSR $ServerNode01_CNF $MDB_CA_CRT $MDB_CA_KEY $ServerNode01_CRT
-gen_node_keycerts $ServerNode02_DIR $ServerNode02_KEY $ServerNode02_CSR $ServerNode02_CNF $MDB_CA_CRT $MDB_CA_KEY $ServerNode02_CRT
-gen_node_keycerts $MDB_NODE_ARB_DIR $MDB_NODE_ARB_KEY $MDB_NODE_ARB_CSR $MDB_NODE_ARB_CNF $MDB_CA_CRT $MDB_CA_KEY $MDB_NODE_ARB_CRT
+gen_replicakeycerts $ServerNode01_DIR $ServerNode01_KEY $ServerNode01_CSR $ServerNode01_CNF $MDB_CA_CRT $MDB_CA_KEY $ServerNode01_CRT
+gen_replicakeycerts $ServerNode02_DIR $ServerNode02_KEY $ServerNode02_CSR $ServerNode02_CNF $MDB_CA_CRT $MDB_CA_KEY $ServerNode02_CRT
+gen_replicakeycerts $MDB_NODE_ARB_DIR $MDB_NODE_ARB_KEY $MDB_NODE_ARB_CSR $MDB_NODE_ARB_CNF $MDB_CA_CRT $MDB_CA_KEY $MDB_NODE_ARB_CRT
 
 printf "Generating client access certificates key and cert $logText \n"
 openssl req -new -out $MDB_CLIENT_CSR -keyout $MDB_CLIENT_KEY -passout pass:"$MDB_PASS_PHRASE_CA" -config $MDB_CLIENT_CN_CNF
