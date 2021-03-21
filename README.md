@@ -33,15 +33,23 @@ Se hacen las siguientes presunciones:
 
 Esta implementación se realizará con Docker Run, de esta manera quedarán los volumenens
 
-Descargar el script de configuración:
+1. Descargar los archivos de configuración:
 
->wget https://raw.githubusercontent.com/kathemica/mongodb-replicaset/main/code/generarEstructura.sh
+* >wget https://raw.githubusercontent.com/kathemica/mongodb-replicaset/main/code/generarEstructura.sh
 
-Le damos atributo de ejecutable 
->sudo chmod -w generarEstructura.sh
+* >wget https://raw.githubusercontent.com/kathemica/mongodb-replicaset/main/code/serverCluster.conf
 
-Luego lo ejecutamos
->sudo sh generarEstructura.sh
+2. creamos una carpeta llamada *conf*:
+> mkdir conf
+
+3. Copiamos el archivo *serverCluster.conf* en *conf*:
+> cp serverCluster.conf conf/
+
+3. Le damos atributo de ejecutable al script:
+> sudo chmod -w generarEstructura.sh
+
+4. Luego ejecutamos el script:
+> sudo sh generarEstructura.sh
 
 
 
