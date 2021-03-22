@@ -1,6 +1,6 @@
 #!/bin/sh
 logText=" ----- "
-CONFS_FILES_DIR="./config/"
+CONFS_FILES_DIR="./secConf/"
 
 #-------------------------------------------------------------------
 # the paths must match in docker-compose.yml file
