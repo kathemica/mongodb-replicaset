@@ -37,6 +37,7 @@ MDB_CA_CRT="server_root_CA.crt"
 MDB_CA_SRL="server_root_CA.srl"
 MDB_CA_CNF="${CONFS_FILES_DIR}server_root_CA.cnf"
 MDB_PASS_PHRASE_CA="b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS0wMi0xOSIsInBhaWRVcFRvIjoiMjAyMi0wMi0"
+MDB_CLUSTER_PHRASE_CA="QzzuGEjsCOURNO7xCeZyCX"
 
 #-------------------------------------------------------------------
 # must match the file name of cluster.conf

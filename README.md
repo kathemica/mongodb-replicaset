@@ -51,20 +51,72 @@ Esta implementación se realizará con Docker Run, de esta manera quedarán los 
 
 Una vez configurado todo el sistema de certificaciones procedemos a levantar las instancias:
 
-sudo docker run --name MGDB_replica01 \
--p 27017:27017 \
---net=host \
---restart always \
--e "TZ=America/Argentina/Buenos_Aires" \
--e MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=1' \
--v $(pwd)/replica01/data:/data/db \
--v $(pwd)/replica01/ssl:/data/ssl \
--v $(pwd)/config:/data/config \
--e MONGO_INITDB_ROOT_USERNAME=mdb_admin \
--e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \
-mongo:4.4.4-bionic \
-mongod --replSet my-mongo-set \
+---
+
+**Primera instancia**:<br> 
+ sudo docker run --name MGDB_replica01 \\<br>
+-p 27017:27017 \\<br>
+--restart always \\<br>
+-e "TZ=America/Argentina/Buenos_Aires" \\<br>
+-e MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=1' \\<br>
+-v $(pwd)/data/replica01:/data/db \\<br>
+-v $(pwd)/ssl/replica01:/data/ssl \\<br>
+-v $(pwd)/config:/data/config \\<br>
+-e MONGO_INITDB_ROOT_USERNAME=mdb_admin \\<br>
+-e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \\<br>
+mongo:4.4.4-bionic \\<br>
 mongod --config /data/config/serverCluster.conf
+
+---
+
+**Segunda instancia**:<br>
+sudo docker run --name MGDB_replica02 \\<br>
+-p 27018:27017 \\<br>
+--restart always \\<br>
+-e "TZ=America/Argentina/Buenos_Aires" \\<br>
+-e MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=1' \\<br>
+-v $(pwd)/data/replica02:/data/db \\<br>
+-v $(pwd)/ssl/replica02:/data/ssl \\<br>
+-v $(pwd)/config:/data/config \\<br>
+-e MONGO_INITDB_ROOT_USERNAME=mdb_admin \\<br>
+-e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \\<br>
+mongo:4.4.4-bionic \\<br>
+mongod --config /data/config/serverCluster.conf
+
+---
+
+**Tercera instancia**:<br>
+sudo docker run --name MGDB_replicaArbiter \\<br>
+-p 27019:27017 \\<br>
+--restart always \\<br>
+-e "TZ=America/Argentina/Buenos_Aires" \\<br>
+-e MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=1' \\<br>
+-v $(pwd)/data/replicaarbiter:/data/db \\<br>
+-v $(pwd)/ssl/replicaarbiter:/data/ssl \\<br>
+-v $(pwd)/config:/data/config \\<br>
+-e MONGO_INITDB_ROOT_USERNAME=mdb_admin \\<br>
+-e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \\<br>
+mongo:4.4.4-bionic \\<br>
+mongod --config /data/config/serverCluster.conf
+
+---
+
+Entramos a la consola de mongo del primer nodo
+> docker exec -it MGDB_replica01 /bin/bash
+
+
+Este comando permite loguearse como root en mongo
+we have to log as root to create the replicaset and the user
+IMPORTANT: Note that we are inside the container and they are reflecting our node mapped volume
+IMPORTANT2: remember the password set in the SCRIPT and cluster.conf. Yes we are using here to connect and decrypt the files
+IMPORTANT3: the option --tlsAllowInvalidHostnames is necessary because we are using self-signed certificates!
+
+<p  style="color:blue">
+mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/mdb_root_CA.crt --tlsCertificateKeyFilePassword "b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS0wMi0xOSIsInBhaWRVcFRvIjoiMjAyMi0wMi0" --tlsAllowInvalidHostnames
+</p>
+
+
+
 
 ---
 
