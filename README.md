@@ -16,7 +16,7 @@
 
 ![header](assets/header.png)
 ---
-# FIUBA - MongoDB replicaset
+# FIUBA - MongoDB replicaset con tres (03) nodos y TLS
 Autor
 * Ing. Katherine E. Aguirre
 <br>
@@ -38,9 +38,9 @@ Esta implementación se realizará con Docker Run, de esta manera quedarán los 
 
 > git clone https://github.com/kathemica/mongodb-replicaset.git
 
-2. Ir a la carpeta mongodb-replicaset/
+2. Ir a la carpeta mongodb-replicaset/ssl
 
->  cd mongodb-replicaset/
+>  cd mongodb-replicaset/ssl
 
 2. Le damos atributo de ejecutable al script:
 > sudo chmod -w configScript.sh
@@ -48,75 +48,80 @@ Esta implementación se realizará con Docker Run, de esta manera quedarán los 
 3. Luego ejecutamos el script para generar los certificados:
 > sudo sh configScript.sh
 
-
-Una vez configurado todo el sistema de certificaciones procedemos a levantar las instancias:
+Una vez que se haya ejecutado el archivo y configurado todo el sistema de certificados procedemos a levantar las instancias:
 
 ---
 
 **Primera instancia**:<br> 
- sudo docker run --name MGDB_replica01 \\<br>
--p 27017:27017 \\<br>
---restart always \\<br>
--e "TZ=America/Argentina/Buenos_Aires" \\<br>
--e MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=1' \\<br>
--v $(pwd)/data/replica01:/data/db \\<br>
--v $(pwd)/ssl/replica01:/data/ssl \\<br>
--v $(pwd)/config:/data/config \\<br>
--e MONGO_INITDB_ROOT_USERNAME=mdb_admin \\<br>
--e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \\<br>
-mongo:4.4.4-bionic \\<br>
+```
+ sudo docker run --name MGDB_replica01 \
+-p 27017:27017 \
+--restart always \
+-e "TZ=America/Argentina/Buenos_Aires" \
+-e MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=1' \
+-v $(pwd)/data/replica01:/data/db \
+-v $(pwd)/ssl/replica01:/data/ssl \
+-v $(pwd)/config:/data/config \
+-e MONGO_INITDB_ROOT_USERNAME=mdb_admin \
+-e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \
+mongo:4.4.4-bionic \
 mongod --config /data/config/serverCluster.conf
-
+```
 ---
 
 **Segunda instancia**:<br>
-sudo docker run --name MGDB_replica02 \\<br>
--p 27018:27017 \\<br>
---restart always \\<br>
--e "TZ=America/Argentina/Buenos_Aires" \\<br>
--e MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=1' \\<br>
--v $(pwd)/data/replica02:/data/db \\<br>
--v $(pwd)/ssl/replica02:/data/ssl \\<br>
--v $(pwd)/config:/data/config \\<br>
--e MONGO_INITDB_ROOT_USERNAME=mdb_admin \\<br>
--e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \\<br>
-mongo:4.4.4-bionic \\<br>
+```
+sudo docker run --name MGDB_replica02 \
+-p 27018:27017 \
+--restart always \
+-e "TZ=America/Argentina/Buenos_Aires" \
+-e MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=1' \
+-v $(pwd)/data/replica02:/data/db \
+-v $(pwd)/ssl/replica02:/data/ssl \
+-v $(pwd)/config:/data/config \
+-e MONGO_INITDB_ROOT_USERNAME=mdb_admin \
+-e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \
+mongo:4.4.4-bionic \
 mongod --config /data/config/serverCluster.conf
-
+```
 ---
 
 **Tercera instancia**:<br>
-sudo docker run --name MGDB_replicaArbiter \\<br>
--p 27019:27017 \\<br>
---restart always \\<br>
--e "TZ=America/Argentina/Buenos_Aires" \\<br>
--e MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=1' \\<br>
--v $(pwd)/data/replicaarbiter:/data/db \\<br>
--v $(pwd)/ssl/replicaarbiter:/data/ssl \\<br>
--v $(pwd)/config:/data/config \\<br>
--e MONGO_INITDB_ROOT_USERNAME=mdb_admin \\<br>
--e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \\<br>
-mongo:4.4.4-bionic \\<br>
+```
+sudo docker run --name MGDB_replicaArbiter \
+-p 27019:27017 \
+--restart always \
+-e "TZ=America/Argentina/Buenos_Aires" \
+-e MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=1' \
+-v $(pwd)/data/replicaarbiter:/data/db \
+-v $(pwd)/ssl/replicaarbiter:/data/ssl \
+-v $(pwd)/config:/data/config \
+-e MONGO_INITDB_ROOT_USERNAME=mdb_admin \
+-e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \
+mongo:4.4.4-bionic \
 mongod --config /data/config/serverCluster.conf
-
+```
 ---
-
-Entramos a la consola de mongo del primer nodo
+Esperamos a que termine de ejecutar el ultimo comando y entramos a la consola de mongo del primer nodo:
 > docker exec -it MGDB_replica01 /bin/bash
 
 
 Este comando permite loguearse como root en mongo
+
 we have to log as root to create the replicaset and the user
+
 IMPORTANT: Note that we are inside the container and they are reflecting our node mapped volume
+
 IMPORTANT2: remember the password set in the SCRIPT and cluster.conf. Yes we are using here to connect and decrypt the files
+
 IMPORTANT3: the option --tlsAllowInvalidHostnames is necessary because we are using self-signed certificates!
 
-<p  style="color:blue">
-mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/mdb_root_CA.crt --tlsCertificateKeyFilePassword b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS0wMi0xOSIsInBhaWRVcFRvIjoiMjAyMi0wMi0 --tlsAllowInvalidHostnames
-</p>
+```
+mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/server_root_CA.crt --tlsCertificateKeyFilePassword b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS --tlsAllowInvalidHostnames
+```
 
 Ahora creamos el archivo de configuracion del cluster
-
+```
 rs.initiate({
   "_id": "my-replica-set", 
   "version": 1, 
@@ -137,7 +142,23 @@ rs.initiate({
     }
   ]
 });
+```
 
+> use admin;
+
+```
+db.createUser({
+  user: "mdb_admin",
+  pwd: "mdb_pass",
+  roles: [
+    {role: "root", db: "admin"},
+    { role: "userAdminAnyDatabase", db: "admin" }, 
+    { role: "dbAdminAnyDatabase", db: "admin" }, 
+    { role: "readWriteAnyDatabase", db:"admin" }, 
+    { role: "clusterAdmin",  db: "admin" }
+  ]
+});
+```
 
 
 ---
