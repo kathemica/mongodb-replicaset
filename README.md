@@ -112,9 +112,31 @@ IMPORTANT2: remember the password set in the SCRIPT and cluster.conf. Yes we are
 IMPORTANT3: the option --tlsAllowInvalidHostnames is necessary because we are using self-signed certificates!
 
 <p  style="color:blue">
-mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/mdb_root_CA.crt --tlsCertificateKeyFilePassword "b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS0wMi0xOSIsInBhaWRVcFRvIjoiMjAyMi0wMi0" --tlsAllowInvalidHostnames
+mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/mdb_root_CA.crt --tlsCertificateKeyFilePassword b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS0wMi0xOSIsInBhaWRVcFRvIjoiMjAyMi0wMi0 --tlsAllowInvalidHostnames
 </p>
 
+Ahora creamos el archivo de configuracion del cluster
+
+rs.initiate({
+  "_id": "my-replica-set", 
+  "version": 1, 
+  "writeConcernMajorityJournalDefault": true, 
+  "members": [
+    { 
+      "_id": 0, 
+      "host": "10.0.0.12:27017", 
+    }, 
+    { 
+      "_id": 1, 
+      "host": "10.0.0.12:27018", 
+    }, 
+    { 
+      "_id": 2, 
+      "host": "10.0.0.12:27019", 
+      arbiterOnly: true 
+    }
+  ]
+});
 
 
 
