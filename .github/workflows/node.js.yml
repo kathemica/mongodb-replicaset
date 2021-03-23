@@ -1,0 +1,24 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Node Console App
+
+on:
+  push:
+    branches: [ main ]  
+jobs:
+  first-job:
+    name: Build with Node
+    runs-on: ubuntu-latest
+    container: node:15.11.0
+    steps:
+      - name: Checking Node.js version
+        run: node --version
+      - name: Checking NPM version
+        run: npm --version
+      - name: Checking out code
+        uses: actions/checkout@main  
+      - name: Installing NPM dependencies
+        run: npm install
+      - name: Running about
+        run: node about.js 
