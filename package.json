@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Node project to populate data for replicaset",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/kathemica/mongodb-replicaset/issues"
   },
-  "homepage": "https://github.com/kathemica/mongodb-replicaset#readme"
+  "homepage": "https://github.com/kathemica/mongodb-replicaset#readme",
+  "dependencies": {
+    "colors": "^1.4.0"
+  }
 }
