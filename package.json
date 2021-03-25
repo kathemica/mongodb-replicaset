@@ -26,6 +26,9 @@
   },
   "homepage": "https://github.com/kathemica/mongodb-replicaset#readme",
   "dependencies": {
-    "colors": "^1.4.0"
+    "bluebird": "^3.7.2",
+    "colors": "^1.4.0",
+    "dotenv": "^8.2.0",
+    "mongodb": "^3.6.5"
   }
 }

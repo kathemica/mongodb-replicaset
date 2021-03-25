@@ -159,10 +159,37 @@ db.createUser({
   ]
 });
 ```
+NOTA:
+Si al ejecutar el comando de crear el usuario obtienes este mensaje:
+>uncaught exception: Error: couldn't add user: command createUser requires authentication :
+_getErrorWithCode@src/mongo/shell/utils.js:25:13
+DB.prototype.createUser@src/mongo/shell/db.js:1386:11
 
+Tienes que ir a *serverCluster.conf* y modificar:
+```
+security:
+  authorization: enabled
+```
+por:
 
+```
+security:
+  authorization: disabled
+```
+una vez creado el usuario vuelves a modificar el archivo y reinicias el cluster.
 ---
 
+Finalmente, para poder hacer operaciones con el cluster emplear el siguiente connection string:
+
+```
+mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/server_root_CA.crt --tlsCertificateKeyFilePassword b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --tlsAllowInvalidHostnames
+```
+
+Convertir root cert .crt a .pem, esto es para uso de **node**
+> openssl x509 -in mycert.crt -out mycert.pem -outform PEM
+
+On Error: Cannot find module 'mongodb', install
+> npm install -g mongodb
 
 2.  Conectarse al Nodo PRIMARY
 
