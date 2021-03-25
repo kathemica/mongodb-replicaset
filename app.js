@@ -14,7 +14,7 @@ import { randomInt, random, sleep } from './assets/supportFunctions.js'
 
 const main = async () => {      
   console.clear();
-  console.log(process.env);
+  // console.log(process.env);
   
   const ca = [fs.readFileSync(process.env.CA_CERT)];    
   const key = fs.readFileSync(process.env.KEY_CERT);
@@ -44,18 +44,23 @@ const main = async () => {
   
   try{
       const client= MongoClient.connect(url, options);
-      console.log(`${'Success'.green} \nMessage: Let's get started!!` );          
+      console.log(`${'In progress...'.blue} \nAwaiting for being connected and start the process\n`);  
+      client.then((result) => {
+        console.log(`${'Connected'.green} \nMessage: Let's get started!!\n` );          
+        const db = result.db(iot);
 
-      const db = (await client).db('iot');
-
-      for (let i=0; i<100; i++) {            
-          await updateDocument(db,i);
-      }
-            
-      console.log(`${'Finishing'.blue} \nMessage: Good bye!!` );      
-      process.exit();
+        for (let i=0; i<100; i++) {            
+            updateDocument(db,i);
+        }
+      }).catch((error) => {
+          console.log(`${'SOMETHING WENT WRONG'.red} we're in trouble, I got this: ${error}\n`);        
+      }).finally(() => {
+          console.log(`${'Closing all...'.blue} Good bye!!\n` )
+          process.exit();
+        }        
+      )                                 
   }catch(e){
-      console.log(`${'ERROR'.red} we're in trouble, I got this: ${e}`);        
+      console.log(`${'ERROR'.red} we're in trouble, I got this: ${e}\n`);        
   }    
 }
 
