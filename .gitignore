@@ -104,3 +104,13 @@ dist
 
 # TernJS port file
 .tern-port
+/ssl/serverclient/mdb_client.csr
+/ssl/serverclient/mdb_client.crt
+/ssl/serverclient/mdb_client.key
+/ssl/serverclient/mdb_client.pem
+/ssl/serverclient/server_root_CA.crt
+/ssl/serverclient/server_root_CA.pem
+/certs
+/.env
+/node_modules
+/package-lock.json

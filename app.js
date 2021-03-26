@@ -6,14 +6,16 @@ require('dotenv').config();
 
 import fs from 'fs';
 import colors from 'colors';
-// import dotenv from 'dotenv';
+import cliProgress from 'cli-progress';
+const _progress = require('cli-progress');
+
 // import { NODE_ENVIRONMENT } from './config/config.js';
 import { randomInt, random, sleep } from './assets/supportFunctions.js'
 
 // console.log(`NODE_ENV=${NODE_ENVIRONMENT}`);
 
 const main = async () => {      
-  console.clear();
+  
   // console.log(process.env);
   
   const ca = [fs.readFileSync(process.env.CA_CERT)];    
@@ -26,13 +28,14 @@ const main = async () => {
   const authMechanism= process.env.AUTHMECANISM;    
   const readPreference = process.env.READPREFERENCE;
   const isSSL = process.env.USE_SSL;
-
-  const url = `mongodb://${serverName}:${port}/?authMechanism=${authMechanism}&replicaSet=${replicaSet}&readPreference=${readPreference}&authSource=%24external&appname=mongodbReplicaset&ssl=${isSSL}`;
+  
+     const url = `mongodb://10.0.0.12:27017/?authMechanism=MONGODB-X509&replicaSet=my-replica-set&readPreference=primary&authSource=%24external&appname=MongoDB%20Compass&ssl=true&authSource=$external`;
+  // const url = `mongodb://${serverName}:${port}/?authMechanism=${authMechanism}&replicaSet=${replicaSet}&readPreference=${readPreference}&authSource=%24external&appname=mongodbReplicaset&ssl=${isSSL}`;
 
   let options = {           
       useNewUrlParser: true,
       poolSize: 15,                        
-      ssl: isSSL,
+      ssl: true,
       sslValidate: false,
       sslCA: ca,
       sslKey: key,
@@ -42,25 +45,50 @@ const main = async () => {
       useUnifiedTopology: true
   };
   
-  try{
-      const client= MongoClient.connect(url, options);
-      console.log(`${'In progress...'.blue} \nAwaiting for being connected and start the process\n`);  
-      client.then((result) => {
-        console.log(`${'Connected'.green} \nMessage: Let's get started!!\n` );          
-        const db = result.db(iot);
+  try{    
+    console.clear();
+    console.log(`${'Creating connection'.green}\n` );         
+    const client= MongoClient.connect(url, options);
+    console.log(`${'\nIn progress...'.blue} \nAwaiting for being connected and start the process\n`)
+    
+    const db = (await client).db('iot');    
+    db ? console.log(`${'Connected'.green} to DB ${'IoT'.yellow}\nMessage: Trying to populate data in ${'devices'.blue} collation.\n` ) : new error("Error con la base de datos");
+    
+    const MAX_INTERATIONS = process.env.MAX_INTERATIONS;
+    
+    console.log(`Populating ${MAX_INTERATIONS} devices, be patient.\n`)
+    
+    // const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+    const progressBar = new _progress.Bar({
+        // blue bar, reset styles after bar element
+        format: 'progress [\u001b[34m{bar}\u001b[0m] {percentage}% | ETA: {eta}s | {value}/{total} | Sensor ID: {speed}',
+        hideCursor: true,
+        barCompleteChar: '\u2588',
+        barIncompleteChar: '\u2591',
+        barGlue: '\u001b[33m' //green
+    });
+    progressBar.start(MAX_INTERATIONS, 0, {
+      speed: "N/A"
+    });
 
-        for (let i=0; i<100; i++) {            
-            updateDocument(db,i);
-        }
-      }).catch((error) => {
-          console.log(`${'SOMETHING WENT WRONG'.red} we're in trouble, I got this: ${error}\n`);        
-      }).finally(() => {
-          console.log(`${'Closing all...'.blue} Good bye!!\n` )
-          process.exit();
-        }        
-      )                                 
+    for (let i=0; i<MAX_INTERATIONS; i++) {                  
+      await updateDocument(db,i);
+      // update the current value in your application..
+      progressBar.update(i+1, {
+        speed: (1029384756+i).toString()
+      });
+    }
+
+    // stop the progress bar
+    progressBar.stop();
+
+    console.log(`\n${'That\'s it,'.blue} Good bye!!\n\n\n`)
+    console.log(`${'Thank you for using my software'.green} Eng. Katherine Aguirre !!\n`)
+    process.exit();                                    
   }catch(e){
-      console.log(`${'ERROR'.red} we're in trouble, I got this: ${e}\n`);        
+      console.log(`${'SOMETHING WENT WRONG'.red} we're in trouble, I got this: ${e}\n`);  
+      console.log(`${'Closing app...'.blue} Good bye!!\n` )
+      process.exit();      
   }    
 }
 
@@ -121,7 +149,7 @@ const updateDocument = async(db,i) => {
       upsert: true, returnNewDocument: true
     }); 
 
-    console.log(`Device: ${deviceId}`);
+    // console.log(`Device: ${deviceId}`);
   }catch(e){
     throw new Error(`${'...Something went wrong, here the details: '.red}`, e)
   }           
