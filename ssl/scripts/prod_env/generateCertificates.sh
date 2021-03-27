@@ -51,8 +51,9 @@ MDB_CLIENT_CN_CNF="${CONFS_FILES_DIR}mdb_client_CN.cnf"
 # DIR         ----- $1 - $X_DIR
 # FILE        ----- $2 - $FILEVAR_NAME
 move_files() {
+    tree
     mkdir $1 2> /dev/null
-    printf "Moving $2 to ./$1/$2 $logText \n"
+    printf "Moviendo $2 A ./$1/$2 $logText \n"
     mv ./$2 ./$1/$2
 }
 
@@ -61,8 +62,9 @@ move_files() {
 # DIR         ----- $1 - $X_DIR
 # FILE        ----- $2 - $FILEVAR_NAME
 copy_files() {
+    tree
     mkdir $1 2> /dev/null
-    printf "Copying $2 to ./$1/$2 $logText \n"
+    printf "Copiando $2 A ./$1/$2 $logText \n"
     cp ./$2 ./$1/$2
 }
 

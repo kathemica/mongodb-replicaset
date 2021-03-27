@@ -32,18 +32,34 @@ Se hacen las siguientes presunciones:
 
 ## Implementar en MongoDB un ReplicaSet con 3 servidores que contengan la información de la BD Finanzas. Un nodo Primary, un secondary y un arbiter.<br>
 
-Esta implementación se realizará con Docker Run, de esta manera quedarán los volumenens
+Esta implementación se realizará con Docker Run, de esta manera quedarán los volúmenes corriendo de una vez, ahora procederemos:
 
-1. Clonar el respositorio
+1. Ir a la carpeta donde se van a guardar los datos y clonar el respositorio:
 
 > git clone https://github.com/kathemica/mongodb-replicaset.git
 
-2. Ir a la carpeta mongodb-replicaset/ssl
+2. Desde la misma carpeta ejecutar: 
 
->  cd mongodb-replicaset/ssl
+```
+sudo mv -v mongodb-replicaset/ssl/scripts/prod_env/* mongodb-replicaset/ssl/
+```
 
-2. Le damos atributo de ejecutable al script:
-> sudo chmod -w configScript.sh
+**NOTA**: dependiendo del ambiente selecciona: *prod_env* ó *dev_env*
+
+3. Ahora procederemos a cambiar los permisos del script:
+
+```
+sudo chmod -w mongodb-replicaset/ssl/generateCertificates.sh
+```
+
+4. Una vez hecho esto debemos seleccionar el archivo de configuracion, para esto ejecutaremos:
+```
+sudo chmod -w mongodb-replicaset/ssl/generateCertificates.sh
+```
+
+Al final de todas estas operaciones nos debería quedar la siguiente estructura:
+
+![header](assets/treeFinal.png)
 
 3. Luego ejecutamos el script para generar los certificados:
 > sudo sh configScript.sh
