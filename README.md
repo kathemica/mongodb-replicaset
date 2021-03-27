@@ -51,7 +51,7 @@ $ sudo rm -r mongodb-replicaset/ssl/scripts
 
 3. Ahora procederemos a cambiar los permisos del script:
 ```
-$ sudo chmod u+x mongodb-replicaset/ssl/generateCertificates.sh
+$ sudo chmod 755 mongodb-replicaset/ssl/generateCertificates.sh
 ```
 
 4. Una vez hecho esto debemos seleccionar el archivo de configuración, para esto ejecutaremos:
@@ -69,7 +69,7 @@ $ sudo rm -r mongodb-replicaset/config/serverCluster.dev.conf
 
 Al final de todas estas operaciones nos debería quedar la siguiente estructura:
 
-![header](assets/treeFinal.png)
+![header](assets/treeFinal.PNG)
 
 5. Luego ejecutamos el script para generar los certificados, navegamos hasta la carpeta ssl y ejecutamos el script:
 > cd mongodb-replicaset/ssl/
