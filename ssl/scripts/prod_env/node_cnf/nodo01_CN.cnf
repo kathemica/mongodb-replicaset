@@ -30,8 +30,8 @@ extendedKeyUsage = clientAuth, serverAuth
 #here you can set your prefered IP pool, each one should have a config mongodb server
 [ alternate_names ]
 IP.1 = 10.0.0.10
-IP.2 = srv-pi-prod
-IP.3 = localhost
+IP.2 = 10.0.0.10
+IP.3 = 10.0.0.10
 IP.4 = 127.0.0.1
 IP.5 = ::1
 DNS.1 = localhost
