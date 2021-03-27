@@ -38,31 +38,43 @@ Esta implementación se realizará con Docker Run, de esta manera quedarán los 
 
 > git clone https://github.com/kathemica/mongodb-replicaset.git
 
-2. Desde la misma carpeta ejecutar: 
-
+2. Ahora vamos a mover los archivos necesarios para correr el script, desde la misma carpeta ejecutamos: 
 ```
-sudo mv -v mongodb-replicaset/ssl/scripts/prod_env/* mongodb-replicaset/ssl/
+$ sudo mv -v mongodb-replicaset/ssl/scripts/prod_env/* mongodb-replicaset/ssl/
 ```
+**NOTA: dependiendo del ambiente selecciona: *prod_env* ó *dev_env***
 
-**NOTA**: dependiendo del ambiente selecciona: *prod_env* ó *dev_env*
+Luego para dejar más limpia la estructura removemos la carpeta que no nos hace falta:
+```
+$ sudo rm -r mongodb-replicaset/ssl/scripts
+```
 
 3. Ahora procederemos a cambiar los permisos del script:
+```
+$ sudo chmod u+x mongodb-replicaset/ssl/generateCertificates.sh
+```
+
+4. Una vez hecho esto debemos seleccionar el archivo de configuración, para esto ejecutaremos:
+```
+$ sudo mv mongodb-replicaset/config/serverCluster.prod.conf mongodb-replicaset/config/serverCluster.conf
+```
+**NOTA: dependiendo del ambiente renombra a sólo *.conf* bien sea *.dev.conf* ó *prod.conf*** 
+
+
+Igualmente procedemos a borrar lo que nos sobra:
 
 ```
-sudo chmod -w mongodb-replicaset/ssl/generateCertificates.sh
-```
-
-4. Una vez hecho esto debemos seleccionar el archivo de configuracion, para esto ejecutaremos:
-```
-sudo chmod -w mongodb-replicaset/ssl/generateCertificates.sh
+$ sudo rm -r mongodb-replicaset/config/serverCluster.dev.conf
 ```
 
 Al final de todas estas operaciones nos debería quedar la siguiente estructura:
 
 ![header](assets/treeFinal.png)
 
-3. Luego ejecutamos el script para generar los certificados:
-> sudo sh configScript.sh
+5. Luego ejecutamos el script para generar los certificados, navegamos hasta la carpeta ssl y ejecutamos el script:
+> cd mongodb-replicaset/ssl/
+
+> ./generateCertificates.sh
 
 Una vez que se haya ejecutado el archivo y configurado todo el sistema de certificados procedemos a levantar las instancias:
 
