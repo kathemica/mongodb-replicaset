@@ -33,7 +33,8 @@ Server_KEY="server_root_CA.key"
 Server_CRT="server_root_CA.crt"
 Server_SRL="server_root_CA.srl"
 Server_CNF="${CONFS_FILES_DIR}server_root_CA.cnf"
-PASS_PHRASE_CA="b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS"
+# PASS_PHRASE_CA="b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS"
+PASS_PHRASE_CA=$1
 CLUSTER_PHRASE_CA="QzzuGEjsCOURNO7xCeZyCX"
 
 #-------------------------------------------------------------------
