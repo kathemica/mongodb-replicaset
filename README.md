@@ -78,6 +78,7 @@ Al final de todas estas operaciones nos debería quedar la siguiente estructura:
 > ./generateCertificates.sh
 
 Luego de ejecutar el script nos queda la siguiente estructura:
+
 ![treeCerts](assets/treeCerts.PNG)
 
 6. Una vez que se haya ejecutado el archivo y configurado todo el sistema de certificados procedemos a levantar las instancias:
@@ -138,7 +139,7 @@ mongod --config /data/config/serverCluster.conf
 > docker exec -it MGDB_replica01 /bin/bash
 
 
-Este comando permite loguearse como root en mongo, es necesario loguearse como root porque necesitamos configurar el replicaset y crear los usuarios.
+Este comando permite loguearse como root en mongo dentro de Docker, es necesario loguearse como root porque necesitamos configurar el replicaset y crear los usuarios.
 
 **NOTA: Ten en cuenta que estamos dentro del contenedor y se estan replicando en los volumenes mapeados.**
 
@@ -216,12 +217,7 @@ security:
 
 Una vez creado el usuario vuelves a modificar el archivo y reinicias el cluster.
 
-On Error: Cannot find module 'mongodb', install
-> npm install -g mongodb
-
 ---
-
-
 ## Conectarse al Nodo PRIMARY
 ---
 
@@ -319,21 +315,27 @@ a. La herramienta se llama [MongoDB Compass](https://www.mongodb.com/try/downloa
 modern applications"), seguimos el link, descargamos e instalamos.
 
 b. Hacemos click en lo subrayado
+
 ![compass01](assets/compass01.PNG)
 
 c. Tecleamos la IP o nombre del servidor, el puerto y seleccionamos X.509 en la autenticación, luego hacemos click en la solapa **More Options**.
+
 ![compass02](assets/compass02.PNG)
 
 d. Tecleamos el nombre del replica set, el tipo de nodo al que nos conectaremos de preferenciam, seleccionamos el tipo de validacion SSL que tendremos, luego cargamos los tres (03) certificados y la clave de desencriptado del certificado, finalmente clickeamos en **Connect**.
+
 ![compass03](assets/compass03.PNG)
 
 e. Una vez conectados podremos ver como está estructurado nuestro Replica set, cuantos nodos lo componen, nombres, bases de datos, tamaños, entre otros.
+
 ![compass04](assets/compass04.PNG)
 
 f. Hacemos click en IOT para ver los detalles, sus colecciones y los detalles.
+
 ![compass05](assets/compass05.PNG)
 
 g. Finalmente podemos ver el detalle de la coleccion con los datos insertados en ella.
+
 ![compass07](assets/compass07.PNG)
 
 
