@@ -33,16 +33,16 @@ const main = async () => {
   try{    
     console.clear();
 
-    console.log(`${'Creating connection'.green}\n` );         
+    console.log(`${'Creando la conexión'.green}\n` );         
     const client= MongoClient.connect(url, options);
-    console.log(`${'\nIn progress...'.blue} \nAwaiting for being connected and start the process\n`)
+    console.log(`${'\nEn progreso...'.blue} \nEsperando por la conexión para iniciar el proceso.\n`)
     
     const db = (await client).db('iot');    
-    db ? console.log(`${'Connected'.green} to DB ${'IoT'.cyan}\nMessage: Trying to populate data in ${'devices'.blue} collation.\n` ) : new error("Error con la base de datos");
+    db ? console.log(`${'Conectada'.green} to DB ${'IoT'.cyan}\nMensaje: Tratando de popular la data en la coleccipon ${'devices'.blue} .\n` ) : new error("Error con la base de datos");
     
     const MAX_INTERATIONS = pEnv.MAX_INTERATIONS;
     
-    console.log(`Populating ${MAX_INTERATIONS} devices, be patient.\n`)
+    console.log(`Cargando ${MAX_INTERATIONS} dispositivos, se paciente.\n`)
       
     const progressBar = new _progress.Bar({
         // blue bar, reset styles after bar element
@@ -67,14 +67,14 @@ const main = async () => {
     // stop the progress bar
     progressBar.stop();
 
-    console.log(`\n${'That\'s it,'.blue} Good bye!!\n\n\n`);
-    console.log(`${'Thank you for using my software'.green} Eng. Katherine Aguirre !!\n`);
+    console.log(`\n${'Listo!!,'.blue} Good bye!!\n\n\n`);
+    console.log(`${'Gracias por usar mi aplicación'.green} Ing. Katherine Aguirre !!\n`);
 
     process.exit();            
 
   }catch(e){
-      console.log(`${'SOMETHING WENT WRONG'.red} we're in trouble, I got this: ${e}\n`);  
-      console.log(`${'Closing app...'.blue} Good bye!!\n` );
+      console.log(`${'OH OH, algo no va bien!!!!'.red}, obtuve ésto: ${e}\n`);  
+      console.log(`${'Cerrando la app...'.blue} lo lamento!!\n` );
       process.exit();      
   }    
 }
@@ -135,9 +135,8 @@ const updateDocument = async(db,i) => {
     },{
       upsert: true, returnNewDocument: true
     }); 
-
-    // console.log(`Device: ${deviceId}`);
+    
   }catch(e){
-    throw new Error(`${'...Something went wrong, here the details: '.red}`, e)
+    throw new Error(`${'...te muestro: '.red}`, e)
   }           
 }

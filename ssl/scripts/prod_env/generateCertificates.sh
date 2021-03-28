@@ -99,7 +99,7 @@ gen_replicakeycerts(){
     move_files $1 $FINAL_KEYCERT_PEM
     copy_files $1 $5
     
-    printf "\FINALIZADO... $1 $TXT_LOG \n"
+    printf "\nFINALIZADO... $1 $TXT_LOG \n"
 }
 
 openssl rand -out .rnd -hex 256

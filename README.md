@@ -31,6 +31,7 @@ Se hacen las siguientes presunciones:
 ---
 
 ## Implementar en MongoDB un ReplicaSet con 3 servidores que contengan la información de la BD Finanzas. Un nodo Primary, un secondary y un arbiter.<br>
+---
 
 Esta implementación se realizará con Docker Run, de esta manera quedarán los volúmenes corriendo de una vez, ahora procederemos:
 
@@ -69,14 +70,17 @@ $ sudo rm -r mongodb-replicaset/config/serverCluster.dev.conf
 
 Al final de todas estas operaciones nos debería quedar la siguiente estructura:
 
-![header](assets/treeFinal.PNG)
+![treeFinal](assets/treeFinal.PNG)
 
 5. Luego ejecutamos el script para generar los certificados, navegamos hasta la carpeta ssl y ejecutamos el script:
 > cd mongodb-replicaset/ssl/
 
 > ./generateCertificates.sh
 
-Una vez que se haya ejecutado el archivo y configurado todo el sistema de certificados procedemos a levantar las instancias:
+Luego de ejecutar el script nos queda la siguiente estructura:
+![treeCerts](assets/treeCerts.PNG)
+
+6. Una vez que se haya ejecutado el archivo y configurado todo el sistema de certificados procedemos a levantar las instancias:
 
 ---
 
@@ -88,7 +92,7 @@ Una vez que se haya ejecutado el archivo y configurado todo el sistema de certif
 -e "TZ=America/Argentina/Buenos_Aires" \
 -e MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=1' \
 -v $(pwd)/data/replica01:/data/db \
--v $(pwd)/ssl/replica01:/data/ssl \
+-v $(pwd)/ssl/nodo01:/data/ssl \
 -v $(pwd)/config:/data/config \
 -e MONGO_INITDB_ROOT_USERNAME=mdb_admin \
 -e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \
@@ -105,7 +109,7 @@ sudo docker run --name MGDB_replica02 \
 -e "TZ=America/Argentina/Buenos_Aires" \
 -e MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=1' \
 -v $(pwd)/data/replica02:/data/db \
--v $(pwd)/ssl/replica02:/data/ssl \
+-v $(pwd)/ssl/nodo02:/data/ssl \
 -v $(pwd)/config:/data/config \
 -e MONGO_INITDB_ROOT_USERNAME=mdb_admin \
 -e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \
@@ -121,8 +125,8 @@ sudo docker run --name MGDB_replicaArbiter \
 --restart always \
 -e "TZ=America/Argentina/Buenos_Aires" \
 -e MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=1' \
--v $(pwd)/data/replicaarbiter:/data/db \
--v $(pwd)/ssl/replicaarbiter:/data/ssl \
+-v $(pwd)/data/replica:/data/db \
+-v $(pwd)/ssl/nodo_arbiter:/data/ssl \
 -v $(pwd)/config:/data/config \
 -e MONGO_INITDB_ROOT_USERNAME=mdb_admin \
 -e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \
@@ -130,22 +134,18 @@ mongo:4.4.4-bionic \
 mongod --config /data/config/serverCluster.conf
 ```
 ---
-Esperamos a que termine de ejecutar el ultimo comando y entramos a la consola de mongo del primer nodo:
+7. Esperamos a que termine de ejecutar el ultimo comando y entramos a la consola de mongo del primer nodo:
 > docker exec -it MGDB_replica01 /bin/bash
 
 
-Este comando permite loguearse como root en mongo
+Este comando permite loguearse como root en mongo, es necesario loguearse como root porque necesitamos configurar el replicaset y crear los usuarios.
 
-we have to log as root to create the replicaset and the user
+**NOTA: Ten en cuenta que estamos dentro del contenedor y se estan replicando en los volumenes mapeados.**
 
-IMPORTANT: Note that we are inside the container and they are reflecting our node mapped volume
-
-IMPORTANT2: remember the password set in the SCRIPT and cluster.conf. Yes we are using here to connect and decrypt the files
-
-IMPORTANT3: the option --tlsAllowInvalidHostnames is necessary because we are using self-signed certificates!
+**OTRA NOTA: Recuerda que la contraseña está seteada en el script y en el archivo serverCluster, es la misma que estaremos usando acá para desencriptar el certificado self-signed.**
 
 ```
-mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/server_root_CA.crt --tlsCertificateKeyFilePassword b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS --tlsAllowInvalidHostnames
+mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/server_root_CA.crt --tlsCertificateKeyFilePassword MjAyMDEwMTkwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwA --tlsAllowInvalidHostnames
 ```
 
 Ahora creamos el archivo de configuracion del cluster
@@ -157,22 +157,27 @@ rs.initiate({
   "members": [
     { 
       "_id": 0, 
-      "host": "10.0.0.12:27017", 
+      "host": "10.0.0.10:27017", 
     }, 
     { 
       "_id": 1, 
-      "host": "10.0.0.12:27018", 
+      "host": "10.0.0.10:27018", 
     }, 
     { 
       "_id": 2, 
-      "host": "10.0.0.12:27019", 
+      "host": "10.0.0.10:27019", 
       arbiterOnly: true 
     }
   ]
 });
 ```
 
+Luego tecleamos lo siguiente:
+
 > use admin;
+
+
+Después esto otro:
 
 ```
 db.createUser({
@@ -187,8 +192,12 @@ db.createUser({
   ]
 });
 ```
-NOTA:
-Si al ejecutar el comando de crear el usuario obtienes este mensaje:
+
+*Et voilá* deberiamos estar listos para poder acceder al replicaset empleando TLS.
+
+
+**NOTA:
+Si al ejecutar el comando de crear el usuario obtienes este mensaje:**
 >uncaught exception: Error: couldn't add user: command createUser requires authentication :
 _getErrorWithCode@src/mongo/shell/utils.js:25:13
 DB.prototype.createUser@src/mongo/shell/db.js:1386:11
@@ -204,48 +213,171 @@ por:
 security:
   authorization: disabled
 ```
-una vez creado el usuario vuelves a modificar el archivo y reinicias el cluster.
----
 
-Finalmente, para poder hacer operaciones con el cluster emplear el siguiente connection string:
-
-```
-mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/server_root_CA.crt --tlsCertificateKeyFilePassword b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --tlsAllowInvalidHostnames
-```
-
-Convertir root cert .crt a .pem, esto es para uso de **node**
-> openssl x509 -in mycert.crt -out mycert.pem -outform PEM
+Una vez creado el usuario vuelves a modificar el archivo y reinicias el cluster.
 
 On Error: Cannot find module 'mongodb', install
 > npm install -g mongodb
 
-2.  Conectarse al Nodo PRIMARY
+---
 
-3.  Crear la db finanzas.
 
-4.  Ejecutar el script facts.js 4 veces para crear volumen de datos.
+## Conectarse al Nodo PRIMARY
+---
 
-5.  Buscar los datos insertados, en el nodo PRIMARY.
+Para poder hacer operaciones con el cluster podemos acceder desde la consola:
 
-6.  Buscar los datos insertados, en el nodo SECONDARY.
+> docker exec -it MGDB_replica01 /bin/bash
 
-7.  Realizar un ejemplo de Fault Tolerance simulando una caída del Servidor PRIMARY.
+luego emplear el siguiente connection string:
 
-1.  Explicar que sucedió.
+```
+mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/server_root_CA.crt --tlsCertificateKeyFilePassword MjAyMDEwMTkwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwA -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --tlsAllowInvalidHostnames
+```
+---
+##  Popular la base de datos.
+---
 
-2.  Verificar el estado de cada servidor.
+Una vez conectados creamos la DB *iot*, para ello:
 
-3.  Insertar un nuevo documento.
+> use iot;
 
-4.  Levantar el servidor caído.
+Así de simple, en mongodb no hay un comando para crear bases de datos como tal, no crearemos la *collection* aun porque de ello se encargará la app de node. Ahora vamos a crear algunos índices para mejorar la performance de la base de datos.
 
-5.  Validar la información en cada servidor.
+```
+// Indices para data no agrupada
+db.devices.createIndex({"date.year" : 1,"date.month" : 1,"date.day" : 1,"date.hour" : 1});
+db.devices.createIndex({"deviceId" : 1,"telemetry.temperature" : 1});
+db.devices.createIndex({"telemetry.temperature" : 1,"telemetry.humidity" : 1});
+db.devices.createIndex({"deviceId" : 1,"sensor" : 1,"telemetry.humidity" : 1});
 
-8.  Agregar un nuevo nodo con slaveDelay de 120 segundos.
+// Indices para data agrupada (Independiente del dia y la hora)
+db.devices.createIndex({"deviceId" : 1,"telemetry.full" : 1});
+db.devices.createIndex({"telemetry.temperature" : 1,"telemetry.humidity" : 1});
 
-9.  Ejecutar nuevamente el script facts.js, asegurarse antes de ejecutarlo que el nodo con
-slaveDelay esté actualizado igual que el PRIMARY.
+// Indices para datos específicos agrupados por fecha/hora
+db.devices.createIndex({"deviceId" : 1,"sensor" : 1,"date.year" : 1,"date.month" : 1,"date.day" : 1,"date.hour" : 1});
+db.devices.createIndex({"date.year" : 1,"date.month" : 1,"date.day" : 1,"date.hour" : 1});
 
-1.  Luego de ejecutado chequear el SECONDARY.
+// Indices relacionados con el día
+db.devices.createIndex({"deviceId" : 1,"sensor" : 1,"date.year" : 1,"date.month" : 1,"date.day" : 1});
+db.devices.createIndex({"date.year" : 1,"date.month" : 1,"date.day" : 1});
+```
 
-2.  Consultar el nuevo nodo y ver cuando se actualizan los datos.
+Salimos de la consola de mongo y volvemos al prompt para seguir haciendo algunas operaciones más.
+
+Podemos usar la herramienta Portainer para visualizar el estado de nuestros contenedores y sus logs.
+
+*Contenedores*
+![Portainer01](assets/portainer01.PNG)
+
+*Logs*
+![Portainer02](assets/portainer02.PNG)
+
+
+Ahora, vamos a usar la aplicación de node para popular la base de datos con data mockeada de sensores, pero antes tenemos que terminar de configurar el entorno, para ello:
+
+1. Vamos a la raíz de nuestro proyecto y renombramos el archivo *env*:
+
+> sudo mv example.env .env
+
+2. Lo editamos:
+
+>sudo nano .env
+
+Seteamos nuestra configuración para las variables de entorno, en este caso deberia contener lo siguiente:
+
+* CA_CERT='path/al/archivo/CA' *<-- debería ser './ssl/client/server_root_CA.crt'*
+* KEY_CERT= 'path/al/archivo/key' *<-- sería './ssl/client/client.key'*
+* PEM_CERT= 'path to your pem cert file' *<-- cambia a './ssl/client/client.pem'*
+* CA_TOKEN= 'put your ca token here' *<-- acá ponemos el token del archivo CA, recuerda que es el que se encuentra en generateCertificates. sh o en serverCluster.conf*
+* REPLICASET= 'put your replica set name here' *<-- el nombre que le pusimos al replica set, recuerda que es **my-replica-set** para este ejemplo*
+* SERVERNAME= 'put your server ip here' *acá ponemos la direccion IP o el nombre del servidor*
+* SERVICE_PORT= mongoServicePortHere *El puerto que le hubieres puesto al set, acá estamos usando el 27017*
+
+3. Ahora procedemos a instalar los paquetes de node, para ello:
+>npm i
+
+---
+## Creando volúmen de datos  
+---
+Ejecutamos 4 veces la app veces para crear volumen de datos.
+
+> node app
+
+---
+##  Buscar los datos insertados, en el nodo PRIMARY.
+---
+
+Vamos a verificar los datos usando mongo compass. Para ello debemos tener acceso a los certificados del cliente, una vez que los consigamos procedemos a configurar la herramienta:
+
+**NOTA: es posible que te aparezca un error cuando estés copiando el certificado client.key, lo resolvemos ejecuntando:**
+
+>  sudo chmod 777 client.key
+
+a. La herramienta se llama [MongoDB Compass](https://www.mongodb.com/try/download/compass "The database for
+modern applications"), seguimos el link, descargamos e instalamos.
+
+b. Hacemos click en lo subrayado
+![compass01](assets/compass01.PNG)
+
+c. Tecleamos la IP o nombre del servidor, el puerto y seleccionamos X.509 en la autenticación, luego hacemos click en la solapa **More Options**.
+![compass02](assets/compass02.PNG)
+
+d. Tecleamos el nombre del replica set, el tipo de nodo al que nos conectaremos de preferenciam, seleccionamos el tipo de validacion SSL que tendremos, luego cargamos los tres (03) certificados y la clave de desencriptado del certificado, finalmente clickeamos en **Connect**.
+![compass03](assets/compass03.PNG)
+
+e. Una vez conectados podremos ver como está estructurado nuestro Replica set, cuantos nodos lo componen, nombres, bases de datos, tamaños, entre otros.
+![compass04](assets/compass04.PNG)
+
+f. Hacemos click en IOT para ver los detalles, sus colecciones y los detalles.
+![compass05](assets/compass05.PNG)
+
+g. Finalmente podemos ver el detalle de la coleccion con los datos insertados en ella.
+![compass07](assets/compass07.PNG)
+
+
+
+---
+##  Buscar los datos insertados, en el nodo SECONDARY.
+---
+
+---
+##  Realizar un ejemplo de Fault Tolerance simulando una caída del Servidor PRIMARY.
+---
+
+---
+##  Explicar que sucedió.
+---
+
+---
+##  Verificar el estado de cada servidor.
+---
+
+---
+##  Insertar un nuevo documento.
+---
+
+---
+##  Levantar el servidor caído.
+---
+
+---
+##  Validar la información en cada servidor.
+---
+
+---
+##  Agregar un nuevo nodo con slaveDelay de 120 segundos.
+---
+
+---
+##  Ejecutar nuevamente el script facts.js, asegurarse antes de ejecutarlo que el nodo con slaveDelay esté actualizado igual que el PRIMARY.
+---
+
+---
+##  Luego de ejecutado chequear el SECONDARY.
+---
+
+---
+##  Consultar el nuevo nodo y ver cuando se actualizan los datos.
+---

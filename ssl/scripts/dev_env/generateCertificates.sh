@@ -1,58 +1,58 @@
 #!/bin/sh
-logText=" ----- "
-CONFS_FILES_DIR="./secConf/"
+TXT_LOG=" ----- "
+CONFS_FILES_DIR="./node_cnf/"
 
 #-------------------------------------------------------------------
 # las rutas de los certificados generados deben coincidir en el archivo serverCluster
-ServerNode01_DIR="replica01"
-ServerNode01_KEY="mdb_replica01.key"
-ServerNode01_CSR="mdb_replica01.csr"
-ServerNode01_CRT="mdb_replica01.crt"
-ServerNode01_CNF="${CONFS_FILES_DIR}ServerNode01_CN.cnf"
+Node01_DIR="nodo01"
+Node01_KEY="nodo01.key"
+Node01_CSR="nodo01.csr"
+Node01_CRT="nodo01.crt"
+Node01_CNF="${CONFS_FILES_DIR}nodo01_CN.cnf"
 
 #-------------------------------------------------------------------
 # las rutas de los certificados generados deben coincidir en el archivo serverCluster
-ServerNode02_DIR="replica02"
-ServerNode02_KEY="mdb_replica02.key"
-ServerNode02_CSR="mdb_replica02.csr"
-ServerNode02_CRT="mdb_replica02.crt"
-ServerNode02_CNF="${CONFS_FILES_DIR}ServerNode02_CN.cnf"
+Node02_DIR="nodo02"
+Node02_KEY="nodo02.key"
+Node02_CSR="nodo02.csr"
+Node02_CRT="nodo02.crt"
+Node02_CNF="${CONFS_FILES_DIR}nodo02_CN.cnf"
 
 #-------------------------------------------------------------------
 # las rutas de los certificados generados deben coincidir en el archivo serverCluster
-MDB_NODE_ARB_DIR="replicaarbiter"
-MDB_NODE_ARB_KEY="mdb_replicaarbiter.key"
-MDB_NODE_ARB_CSR="mdb_replicaarbiter.csr"
-MDB_NODE_ARB_CRT="mdb_replicaarbiter.crt"
-MDB_NODE_ARB_CNF="${CONFS_FILES_DIR}mdb_replicaarbiter_CN.cnf"
+NodeArbiter_DIR="nodo_arbiter"
+NodeArbiter_KEY="nodo_arbiter.key"
+NodeArbiter_CSR="nodo_arbiter.csr"
+NodeArbiter_CRT="nodo_arbiter.crt"
+NodeArbiter_CNF="${CONFS_FILES_DIR}nodo_arbiter_CN.cnf"
 
 #-------------------------------------------------------------------
 # las rutas de los certificados generados deben coincidir en el archivo serverCluster
-MDB_CA_DIR="CA"
-MDB_CA_KEY="server_root_CA.key"
-MDB_CA_CRT="server_root_CA.crt"
-MDB_CA_SRL="server_root_CA.srl"
-MDB_CA_CNF="${CONFS_FILES_DIR}server_root_CA.cnf"
-MDB_PASS_PHRASE_CA="b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS"
-MDB_CLUSTER_PHRASE_CA="QzzuGEjsCOURNO7xCeZyCX"
+Server_DIR="CA"
+Server_KEY="server_root_CA.key"
+Server_CRT="server_root_CA.crt"
+Server_SRL="server_root_CA.srl"
+Server_CNF="${CONFS_FILES_DIR}server_root_CA.cnf"
+PASS_PHRASE_CA="b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS"
+CLUSTER_PHRASE_CA="QzzuGEjsCOURNO7xCeZyCX"
 
 #-------------------------------------------------------------------
 # las rutas de los certificados generados deben coincidir en el archivo serverCluster
-MDB_FINAL_KEYCERT_PEM="mdb_nodes_keycert.pem"
-MDB_CLIENT_DIR="serverclient"
-MDB_CLIENT_KEY="mdb_client.key"
-MDB_CLIENT_CSR="mdb_client.csr"
-MDB_CLIENT_CRT="mdb_client.crt"
-MDB_CLIENT_PEM="mdb_client.pem"
-MDB_CLIENT_CN_CNF="${CONFS_FILES_DIR}mdb_client_CN.cnf"
+FINAL_KEYCERT_PEM="mdb_nodes_keycert.pem"
+Client_DIR="client"
+Client_KEY="client.key"
+Client_CSR="client.csr"
+Client_CRT="client.crt"
+Client_PEM="client.pem"
+Client_CN_CNF="${CONFS_FILES_DIR}client_CN.cnf"
 
 #-------------------------------------------------------------------
 # Orden de los parámetros
 # DIR         ----- $1 - $X_DIR
 # FILE        ----- $2 - $FILEVAR_NAME
-move_files() {
+move_files() {    
     mkdir $1 2> /dev/null
-    printf "Moving $2 to ./$1/$2 $logText \n"
+    printf "Moviendo $2 A ./$1/$2 $TXT_LOG  \n"
     mv ./$2 ./$1/$2
 }
 
@@ -60,9 +60,9 @@ move_files() {
 # Orden de los parámetros
 # DIR         ----- $1 - $X_DIR
 # FILE        ----- $2 - $FILEVAR_NAME
-copy_files() {
+copy_files() {    
     mkdir $1 2> /dev/null
-    printf "Copying $2 to ./$1/$2 $logText \n"
+    printf "Copiando $2 A ./$1/$2 $TXT_LOG  \n"
     cp ./$2 ./$1/$2
 }
 
@@ -72,67 +72,70 @@ copy_files() {
 # NODE .key file  ----- $2 - $MDB_NODEX_KEY
 # NODE .csr file  ----- $3 - $MDB_NODEX_CSR
 # NODE .cnf file  ----- $4 - $MDB_NODEX_CNF
-# MDB CA .crt file  ----- $5 - $MDB_CA_CRT
-# MDB CA .key file  ----- $6 - $MDB_CA_KEY
+# MDB CA .crt file  ----- $5 - $Server_CRT
+# MDB CA .key file  ----- $6 - $Server_KEY
 # NODE .crt file  ----- $7 - $MDB_NODEX_CRT
 gen_replicakeycerts(){
-    printf "\nGenerando certificados de $1 $logText \n"
+    printf "\nGenerando certificados de $1 $TXT_LOG  \n"
     
     mkdir $1 2> /dev/null
 
-    printf "nGenerando $1 - archivos .KEY y .CSR $logText\n"
+    printf "nGenerando $1 - archivos .KEY y .CSR $TXT_LOG \n"
     
-    openssl genrsa -des3 -out $2 -passout pass:"$MDB_PASS_PHRASE_CA" 4096
+    openssl genrsa -des3 -out $2 -passout pass:"$PASS_PHRASE_CA" 4096
     
-    printf "\nGenerando $1 - archivo .CRT $logText\n"
+    printf "\nGenerando $1 - archivo .CRT $TXT_LOG \n"
     
-    openssl req -new -config $4 -key $2 -passin pass:"$MDB_PASS_PHRASE_CA" -out $3 -config $4
-    openssl x509 -req -days 365 -in $3 -CA $5 -CAkey $6 -CAcreateserial -passin pass:"$MDB_PASS_PHRASE_CA" -out $7
+    openssl req -new -config $4 -key $2 -passin pass:"$PASS_PHRASE_CA" -out $3 -config $4
+    openssl x509 -req -days 365 -in $3 -CA $5 -CAkey $6 -CAcreateserial -passin pass:"$PASS_PHRASE_CA" -out $7
     
-    printf "\nGenerando $1 - archivo .PEM $logText\n"
+    printf "\nGenerando $1 - archivo .PEM $TXT_LOG \n"
     
-    cat $2 $7 > $MDB_FINAL_KEYCERT_PEM
+    cat $2 $7 > $FINAL_KEYCERT_PEM
     
     move_files $1 $2
     move_files $1 $3
     move_files $1 $7
-    move_files $1 $MDB_FINAL_KEYCERT_PEM
+    move_files $1 $FINAL_KEYCERT_PEM
     copy_files $1 $5
     
-    printf "\FINALIZADO... $1 $logText\n"
+    printf "\nFINALIZADO... $1 $TXT_LOG \n"
 }
 
 openssl rand -out .rnd -hex 256
-printf "INICIANDO SCRIPT $logText\n\n"
+printf "INICIANDO SCRIPT $TXT_LOG \n\n"
 
-openssl genrsa -des3 -out $MDB_CA_KEY -passout pass:"$MDB_PASS_PHRASE_CA" 4096
-printf "Root CA .key OK $logText \n"
+openssl genrsa -des3 -out $Server_KEY -passout pass:"$PASS_PHRASE_CA" 4096
+printf "Root CA .key OK $TXT_LOG  \n"
 
-openssl req -x509 -new -key $MDB_CA_KEY -sha256 -passin pass:"$MDB_PASS_PHRASE_CA" -days 720 -out $MDB_CA_CRT -config $MDB_CA_CNF
-printf "Root CA .crt OK $logText \n"
+openssl req -x509 -new -key $Server_KEY -sha256 -passin pass:"$PASS_PHRASE_CA" -days 720 -out $Server_CRT -config $Server_CNF
+printf "Root CA .crt OK $TXT_LOG  \n"
 
-printf "FINALIZADO CERTIFICADO CA $logText \n"
+printf "FINALIZADO CERTIFICADO CA $TXT_LOG  \n"
 
-gen_replicakeycerts $ServerNode01_DIR $ServerNode01_KEY $ServerNode01_CSR $ServerNode01_CNF $MDB_CA_CRT $MDB_CA_KEY $ServerNode01_CRT
-gen_replicakeycerts $ServerNode02_DIR $ServerNode02_KEY $ServerNode02_CSR $ServerNode02_CNF $MDB_CA_CRT $MDB_CA_KEY $ServerNode02_CRT
-gen_replicakeycerts $MDB_NODE_ARB_DIR $MDB_NODE_ARB_KEY $MDB_NODE_ARB_CSR $MDB_NODE_ARB_CNF $MDB_CA_CRT $MDB_CA_KEY $MDB_NODE_ARB_CRT
+gen_replicakeycerts $Node01_DIR $Node01_KEY $Node01_CSR $Node01_CNF $Server_CRT $Server_KEY $Node01_CRT
+gen_replicakeycerts $Node02_DIR $Node02_KEY $Node02_CSR $Node02_CNF $Server_CRT $Server_KEY $Node02_CRT
+gen_replicakeycerts $NodeArbiter_DIR $NodeArbiter_KEY $NodeArbiter_CSR $NodeArbiter_CNF $Server_CRT $Server_KEY $NodeArbiter_CRT
 
-printf "Generando certificados de acceso del cliente: .key y .cert $logText \n"
-openssl req -new -out $MDB_CLIENT_CSR -keyout $MDB_CLIENT_KEY -passout pass:"$MDB_PASS_PHRASE_CA" -config $MDB_CLIENT_CN_CNF
+printf "Generando certificados de acceso del cliente: .key y .cert $TXT_LOG  \n"
+openssl req -new -out $Client_CSR -keyout $Client_KEY -passout pass:"$PASS_PHRASE_CA" -config $Client_CN_CNF
 
-printf "Firmando certificados de acceso del cliente$logText \n"
-openssl x509 -req -in $MDB_CLIENT_CSR -CA $MDB_CA_CRT -CAkey $MDB_CA_KEY -passin pass:"$MDB_PASS_PHRASE_CA" -out $MDB_CLIENT_CRT
+printf "Firmando certificados de acceso del cliente $TXT_LOG  \n"
+openssl x509 -req -in $Client_CSR -CA $Server_CRT -CAkey $Server_KEY -passin pass:"$PASS_PHRASE_CA" -out $Client_CRT
 
-printf "Generando archivo .PEM del cliente $logText \n"
+printf "Generando archivo .PEM del cliente $TXT_LOG  \n"
 
-cat $MDB_CLIENT_KEY $MDB_CLIENT_CRT > $MDB_CLIENT_PEM
-move_files $MDB_CLIENT_DIR $MDB_CLIENT_CSR
-move_files $MDB_CLIENT_DIR $MDB_CLIENT_KEY
-move_files $MDB_CLIENT_DIR $MDB_CLIENT_CRT
-move_files $MDB_CLIENT_DIR $MDB_CLIENT_PEM
-copy_files $MDB_CLIENT_DIR $MDB_CA_CRT
-move_files $MDB_CA_DIR $MDB_CA_KEY
-move_files $MDB_CA_DIR $MDB_CA_CRT
-move_files $MDB_CA_DIR $MDB_CA_SRL
+cat $Client_KEY $Client_CRT > $Client_PEM
 
-printf "FINALIZADO $1 $logText\n"
+move_files $Client_DIR $Client_CSR
+move_files $Client_DIR $Client_KEY
+move_files $Client_DIR $Client_CRT
+move_files $Client_DIR $Client_PEM
+
+copy_files $Client_DIR $Server_CRT
+
+move_files $Server_DIR $Server_KEY
+move_files $Server_DIR $Server_CRT
+move_files $Server_DIR $Server_SRL
+
+printf "FINALIZADO $1 $TXT_LOG \n"
