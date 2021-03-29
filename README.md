@@ -244,7 +244,7 @@ luego emplear el siguiente connection string:
 mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/server_root_CA.crt --tlsCertificateKeyFilePassword b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --tlsAllowInvalidHostnames
 ```
 ---
-##  Popular la base de datos.
+##  Poblar la base de datos.
 ---
 
 Una vez conectados creamos la DB *iot*, para ello:
