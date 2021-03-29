@@ -1,8 +1,11 @@
 #!/bin/bash
 clear
 
-ambientDeploy = $1;
-caPass = $2;
+AMBIENT_DEPLOY = $1;
+CA_PASS = $2;
+
+echo "Ambient: $AMBIENT_DEPLOY";
+echo "Pass: $CA_PASS";
 
 #-------------------------------------------------------------------------------------------------
 printf "\n"
@@ -15,9 +18,9 @@ printf "\n"
 #git clone https://github.com/kathemica/mongodb-replicaset.git
 
 #-------------------------------------------------------------------------------------------------
-printf '\e[1;32m%-6s\e[m' "2 Moviendo los archivos del ambiente seleccionado [$ambientDeploy]..."
+printf '\e[1;32m%-6s\e[m' "2 Moviendo los archivos del ambiente seleccionado [$AMBIENT_DEPLOY]..."
 printf "\n"
-if [[ $ambientDeploy == "dev" ]]; then
+if [[ $AMBIENT_DEPLOY == "dev" ]]; then
   sudo mv -v ssl/scripts/dev_env/* ssl/
 else
   sudo mv -v ssl/scripts/prod_env/* ssl/
@@ -34,9 +37,9 @@ printf "\n"
 sudo chmod 755 ssl/generateCertificates.sh 
 
 #-------------------------------------------------------------------------------------------------
-printf '\e[1;32m%-6s\e[m' "5 Cambiando nombre al arhivo de configuración de los nodos para [$ambientDeploy]..."
+printf '\e[1;32m%-6s\e[m' "5 Cambiando nombre al arhivo de configuración de los nodos para [$AMBIENT_DEPLOY]..."
 printf "\n"
-if [[ $ambientDeploy == "dev" ]]; then
+if [[ $AMBIENT_DEPLOY == "dev" ]]; then
   sudo mv config/serverCluster.dev.conf config/serverCluster.conf
 else
   sudo mv config/serverCluster.prod.conf config/serverCluster.conf
@@ -45,7 +48,7 @@ fi
 #-------------------------------------------------------------------------------------------------
 printf '\e[1;32m%-6s\e[m' "6 Eliminando archivos innnecesarios de la carpeta config..."
 printf "\n"
-if [[ $ambientDeploy == "dev" ]]; then
+if [[ $AMBIENT_DEPLOY == "dev" ]]; then
   sudo rm -r config/serverCluster.prod.conf
 else
   sudo rm -r config/serverCluster.dev.conf
@@ -59,7 +62,7 @@ cd ssl/
 #-------------------------------------------------------------------------------------------------
 printf '\e[1;32m%-6s\e[m' "8 Generando certificados..."
 printf "\n" 
-sh generateCertificates.sh $caPass
+sh generateCertificates.sh $CA_PASS
 cd ..
 
 #-------------------------------------------------------------------------------------------------
