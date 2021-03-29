@@ -70,7 +70,7 @@ $ sudo rm -r mongodb-replicaset/config/serverCluster.dev.conf
 
 Al final de todas estas operaciones nos debería quedar la siguiente estructura:
 
-![treeFinal](assets/treeFinal.PNG)
+<img src="assets/treeFinal.PNG" width="350">
 
 5. Luego ejecutamos el script para generar los certificados, navegamos hasta la carpeta ssl y ejecutamos el script:
 > cd mongodb-replicaset/ssl/
@@ -79,7 +79,7 @@ Al final de todas estas operaciones nos debería quedar la siguiente estructura:
 
 Luego de ejecutar el script nos queda la siguiente estructura:
 
-![treeCerts](assets/treeCerts.PNG)
+<img src="assets/treeCerts.PNG" width="300">
 
 6. Una vez que se haya ejecutado el archivo y configurado todo el sistema de certificados procedemos a levantar las instancias:
 

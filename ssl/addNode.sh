@@ -1,7 +1,7 @@
 #!/bin/sh
 TXT_LOG=" ----- "
 CONFS_FILES_DIR="./node_cnf/"
-Server_DIR="./CA/"
+CA_DIR="./CA/"
 #-------------------------------------------------------------------
 # las rutas de los certificados generados deben coincidir en el archivo serverCluster
 NodeXX_DIR=$1
@@ -12,8 +12,9 @@ NodeXX_CNF="${CONFS_FILES_DIR}node_base.cnf"
 
 #-------------------------------------------------------------------
 # las rutas de los certificados generados deben coincidir en el archivo serverCluster
-Server_CRT="${Server_DIR}server_root_CA.crt"
+Server_CRT="server_root_CA.crt"
 PASS_PHRASE_CA=$2
+FINAL_KEYCERT_PEM="mdb_nodes_keycert.pem"
 
 #-------------------------------------------------------------------
 # Orden de los parámetros
@@ -55,7 +56,7 @@ gen_replicakeycerts(){
     
     printf "\nGenerando $1 - archivo .CRT $TXT_LOG \n"
     
-    openssl req -new -config $4 -key $2 -passin pass:"$PASS_PHRASE_CA" -out $3 -config $4
+    openssl req -new -config <(cat ./node_cnf/node_base.cnf <(printf "[SAN]\nsubjectAltName=IP:10.0.0.10,IP:10.0.0.10")) -key $2 -passin pass:"$PASS_PHRASE_CA" -out $3 -config <(cat ./node_cnf/node_base.cnf <(printf "[SAN]\nsubjectAltName=IP:10.0.0.10,IP:10.0.0.10"))
     openssl x509 -req -days 365 -in $3 -CA $5 -CAkey $6 -CAcreateserial -passin pass:"$PASS_PHRASE_CA" -out $7
     
     printf "\nGenerando $1 - archivo .PEM $TXT_LOG \n"
@@ -66,7 +67,7 @@ gen_replicakeycerts(){
     move_files $1 $3
     move_files $1 $7
     move_files $1 $FINAL_KEYCERT_PEM
-    copy_files $1 $5
+    copy_files $1 "$CA_DIR$5"
     
     printf "\nFINALIZADO... $1 $TXT_LOG \n"
 }
