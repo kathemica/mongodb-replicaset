@@ -135,9 +135,22 @@ mongo:4.4.4-bionic \
 mongod --config /data/config/serverCluster.conf
 ```
 ---
-7. Esperamos a que termine de ejecutar el ultimo comando y entramos a la consola de mongo del primer nodo:
-> docker exec -it MGDB_replica01 /bin/bash
+**NOTA: HASTA ACÁ TODOS LOS PASOS PREVIOS SE PUEDEN AHORRAR EJECUTANDO:**
 
+>sh config.sh `<dev>|<prod>` <CERT_PASS>
+
+Dependiendo del ambiente selecciona *dev* ó *prod*, seguido de la password del certificado CA
+
+I.e:
+> sh config.sh dev b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS
+
+*Este script ejecuta todos los pasos previos y deja el ambiente listo para configurar con los pasos que siguen.*
+
+---
+
+7. Esperamos a que termine de ejecutar el ultimo comando y entramos a la consola de mongo del primer nodo:
+
+> docker exec -it MGDB_replica01 /bin/bash
 
 Este comando permite loguearse como root en mongo dentro de Docker, es necesario loguearse como root porque necesitamos configurar el replicaset y crear los usuarios.
 
@@ -176,7 +189,6 @@ rs.initiate({
 Luego tecleamos lo siguiente:
 
 > use admin;
-
 
 Después esto otro:
 
@@ -228,7 +240,7 @@ Para poder hacer operaciones con el cluster podemos acceder desde la consola:
 luego emplear el siguiente connection string:
 
 ```
-mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/server_root_CA.crt --tlsCertificateKeyFilePassword MjAyMDEwMTkwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwA -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --tlsAllowInvalidHostnames
+mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/server_root_CA.crt --tlsCertificateKeyFilePassword b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --tlsAllowInvalidHostnames
 ```
 ---
 ##  Popular la base de datos.
@@ -286,7 +298,7 @@ Seteamos nuestra configuración para las variables de entorno, en este caso debe
 * CA_CERT='path/al/archivo/CA' *<-- debería ser './ssl/client/server_root_CA.crt'*
 * KEY_CERT= 'path/al/archivo/key' *<-- sería './ssl/client/client.key'*
 * PEM_CERT= 'path to your pem cert file' *<-- cambia a './ssl/client/client.pem'*
-* CA_TOKEN= 'put your ca token here' *<-- acá ponemos el token del archivo CA, recuerda que es el que se encuentra en generateCertificates. sh o en serverCluster.conf*
+* CA_TOKEN= 'put your ca token here' *<-- acá ponemos el token del archivo CA, recuerda que es el que se encuentra en serverCluster.conf*
 * REPLICASET= 'put your replica set name here' *<-- el nombre que le pusimos al replica set, recuerda que es **my-replica-set** para este ejemplo*
 * SERVERNAME= 'put your server ip here' *acá ponemos la direccion IP o el nombre del servidor*
 * SERVICE_PORT= mongoServicePortHere *El puerto que le hubieres puesto al set, acá estamos usando el 27017*
@@ -309,7 +321,7 @@ Vamos a verificar los datos usando mongo compass. Para ello debemos tener acceso
 
 **NOTA: es posible que te aparezca un error cuando estés copiando el certificado client.key, lo resolvemos ejecuntando:**
 
->  sudo chmod 777 client.key
+>  sudo chmod 775 client.key
 
 a. La herramienta se llama [MongoDB Compass](https://www.mongodb.com/try/download/compass "The database for
 modern applications"), seguimos el link, descargamos e instalamos.
@@ -344,9 +356,29 @@ g. Finalmente podemos ver el detalle de la coleccion con los datos insertados en
 ##  Buscar los datos insertados, en el nodo SECONDARY.
 ---
 
+Nos conectamos en la consola al contenedor en docker
+>$ docker exec -it MGDB_replica02 /bin/bash
+
+>$ mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/server_root_CA.crt --tlsCertificateKeyFilePassword b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --tlsAllowInvalidHostnames
+
+>$ rs.secondaryOk();
+
+>$ use iot;
+
+>$ db.devices.count();
+
 ---
 ##  Realizar un ejemplo de Fault Tolerance simulando una caída del Servidor PRIMARY.
 ---
+
+Usando Portainer vamos a detener el nodo primario para provocar una falla.
+
+En la misma consola anterior ejecutamos:
+
+> rs.status()
+
+
+
 
 ---
 ##  Explicar que sucedió.
