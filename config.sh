@@ -2,16 +2,7 @@
 clear
 
 ambientDeploy = $1;
-if [ -z "$ambientDeploy" ];
-  then echo "$ambientDeploy is null or empty, setting DEV as default value";
-  else ambientDeploy = "dev";
-fi
-
 caPass = $2;
-if [ -z "$caPass" ];
-  then echo "$caPass is null or empty, setting 1a2B3c4D5e6F as default value";
-  else caPass = "1a2B3c4D5e6F";
-fi
 
 #-------------------------------------------------------------------------------------------------
 printf "\n"
