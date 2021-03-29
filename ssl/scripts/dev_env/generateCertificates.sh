@@ -117,6 +117,8 @@ gen_replicakeycerts $Node01_DIR $Node01_KEY $Node01_CSR $Node01_CNF $Server_CRT 
 gen_replicakeycerts $Node02_DIR $Node02_KEY $Node02_CSR $Node02_CNF $Server_CRT $Server_KEY $Node02_CRT
 gen_replicakeycerts $NodeArbiter_DIR $NodeArbiter_KEY $NodeArbiter_CSR $NodeArbiter_CNF $Server_CRT $Server_KEY $NodeArbiter_CRT
 
+######################################################################################
+
 printf "Generando certificados de acceso del cliente: .key y .cert $TXT_LOG  \n"
 openssl req -new -out $Client_CSR -keyout $Client_KEY -passout pass:"$PASS_PHRASE_CA" -config $Client_CN_CNF
 
@@ -126,6 +128,8 @@ openssl x509 -req -in $Client_CSR -CA $Server_CRT -CAkey $Server_KEY -passin pas
 printf "Generando archivo .PEM del cliente $TXT_LOG  \n"
 
 cat $Client_KEY $Client_CRT > $Client_PEM
+
+######################################################################################
 
 move_files $Client_DIR $Client_CSR
 move_files $Client_DIR $Client_KEY
