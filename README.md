@@ -142,7 +142,7 @@ mongod --config /data/config/serverCluster.conf
 Dependiendo del ambiente selecciona *dev* ó *prod*, seguido de la password del certificado CA
 
 I.e:
-> sh config.sh dev b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS
+> source ./config.sh dev b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS
 
 *Este script ejecuta todos los pasos previos y deja el ambiente listo para configurar con los pasos que siguen.*
 
@@ -367,17 +367,21 @@ Nos conectamos en la consola al contenedor en docker
 
 >$ db.devices.count();
 
+Verificamos que el número sea igual al número de dispositivos creados en la app de node, en este caso serían 1000
+
+![secondaryCount](assets/secondaryCount.PNG)
+
 ---
 ##  Realizar un ejemplo de Fault Tolerance simulando una caída del Servidor PRIMARY.
 ---
 
 Usando Portainer vamos a detener el nodo primario para provocar una falla.
 
-En la misma consola anterior ejecutamos:
+Una vez detenido el contenedor vamos a la misma consola anterior y ejecutamos:
 
 > rs.status()
 
-
+Y buscamos 
 
 
 ---

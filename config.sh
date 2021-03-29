@@ -1,18 +1,17 @@
 #!/bin/bash
 clear
-echo "Ambiente: $1";
-echo "CA Pass: $2";
 
-#Funcion que crea un contador de N a 0
-#Parámetro
-#Tiempo  -- $1
-timerFunction(){
-    for (( c=$1; c>0; c-- ))
-        do  
-            echo -ne "\r$c ";
-            sleep 1;
-    done
-}
+local ambientDeploy = $1;
+if [ -z "$ambientDeploy" ];
+  then echo "$ambientDeploy is null or empty, setting DEV as default value";
+  else ambientDeploy = "dev";
+fi
+
+local caPass = $2;
+if [ -z "$caPass" ];
+  then echo "$caPass is null or empty, setting 1a2B3c4D5e6F as default value";
+  else caPass = "1a2B3c4D5e6F";
+fi
 
 #-------------------------------------------------------------------------------------------------
 printf "\n"
@@ -22,12 +21,12 @@ printf "\n"
 #-------------------------------------------------------------------------------------------------
 printf '\e[1;32m%-6s\e[m' "1 Clonando repositorio..."
 printf "\n"
-git clone https://github.com/kathemica/mongodb-replicaset.git
+#git clone https://github.com/kathemica/mongodb-replicaset.git
 
 #-------------------------------------------------------------------------------------------------
-printf '\e[1;32m%-6s\e[m' "2 Moviendo los archivos del ambiente seleccionado [$1]..."
+printf '\e[1;32m%-6s\e[m' "2 Moviendo los archivos del ambiente seleccionado [$ambientDeploy]..."
 printf "\n"
-if [ $1 == "dev" ]; then
+if [[ $ambientDeploy == "dev" ]]; then
   sudo mv -v ssl/scripts/dev_env/* ssl/
 else
   sudo mv -v ssl/scripts/prod_env/* ssl/
@@ -44,9 +43,9 @@ printf "\n"
 sudo chmod 755 ssl/generateCertificates.sh 
 
 #-------------------------------------------------------------------------------------------------
-printf '\e[1;32m%-6s\e[m' "5 Cambiando nombre al arhivo de configuración de los nodos para [$1]..."
+printf '\e[1;32m%-6s\e[m' "5 Cambiando nombre al arhivo de configuración de los nodos para [$ambientDeploy]..."
 printf "\n"
-if [ $1 == "dev" ]; then
+if [[ $ambientDeploy == "dev" ]]; then
   sudo mv config/serverCluster.dev.conf config/serverCluster.conf
 else
   sudo mv config/serverCluster.prod.conf config/serverCluster.conf
@@ -55,7 +54,7 @@ fi
 #-------------------------------------------------------------------------------------------------
 printf '\e[1;32m%-6s\e[m' "6 Eliminando archivos innnecesarios de la carpeta config..."
 printf "\n"
-if [ $1 == "dev" ]; then
+if [[ $ambientDeploy == "dev" ]]; then
   sudo rm -r config/serverCluster.prod.conf
 else
   sudo rm -r config/serverCluster.dev.conf
@@ -69,7 +68,7 @@ cd ssl/
 #-------------------------------------------------------------------------------------------------
 printf '\e[1;32m%-6s\e[m' "8 Generando certificados..."
 printf "\n" 
-sh generateCertificates.sh $2
+sh generateCertificates.sh $caPass
 cd ..
 
 #-------------------------------------------------------------------------------------------------
