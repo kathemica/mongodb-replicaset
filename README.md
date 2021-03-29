@@ -159,7 +159,7 @@ Este comando permite loguearse como root en mongo dentro de Docker, es necesario
 **OTRA NOTA: Recuerda que la contraseña está seteada en el script y en el archivo serverCluster, es la misma que estaremos usando acá para desencriptar el certificado self-signed.**
 
 ```
-mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/server_root_CA.crt --tlsCertificateKeyFilePassword MjAyMDEwMTkwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwA --tlsAllowInvalidHostnames
+mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/server_root_CA.crt --tlsCertificateKeyFilePassword b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS --tlsAllowInvalidHostnames
 ```
 
 Ahora creamos el archivo de configuracion del cluster
@@ -171,15 +171,15 @@ rs.initiate({
   "members": [
     { 
       "_id": 0, 
-      "host": "10.0.0.10:27017", 
+      "host": "10.0.0.12:27017", 
     }, 
     { 
       "_id": 1, 
-      "host": "10.0.0.10:27018", 
+      "host": "10.0.0.12:27018", 
     }, 
     { 
       "_id": 2, 
-      "host": "10.0.0.10:27019", 
+      "host": "10.0.0.12:27019", 
       arbiterOnly: true 
     }
   ]
@@ -206,7 +206,8 @@ db.createUser({
 });
 ```
 
-*Et voilá* deberiamos estar listos para poder acceder al replicaset empleando TLS.
+*Et voilá* deberiamos estar listos para poder acceder al replicaset empleando TLS. Ahora salimos de la consola del nodo para entrar nuevamente en el siguiente paso.
+>$ exit
 
 
 **NOTA:
@@ -250,7 +251,7 @@ Una vez conectados creamos la DB *iot*, para ello:
 
 > use iot;
 
-Así de simple, en mongodb no hay un comando para crear bases de datos como tal, no crearemos la *collection* aun porque de ello se encargará la app de node. Ahora vamos a crear algunos índices para mejorar la performance de la base de datos.
+Así de simple, en mongodb no hay un comando para crear bases de datos como tal, no crearemos la *collection* aun porque de ello se encargará la app de node. Ahora vamos a crear algunos índices para mejorar la performance de la base de datos, seleccionamos todo el texto y lo pegamos en la consola, al final presionas enter:
 
 ```
 // Indices para data no agrupada
@@ -274,7 +275,9 @@ db.devices.createIndex({"date.year" : 1,"date.month" : 1,"date.day" : 1});
 
 Salimos de la consola de mongo y volvemos al prompt para seguir haciendo algunas operaciones más.
 
-Podemos usar la herramienta Portainer para visualizar el estado de nuestros contenedores y sus logs.
+>$ exit <-- dos (02) veces
+
+Como punto adicional podemos usar la herramienta Portainer o Yatch para visualizar el estado de nuestros contenedores y sus logs.
 
 *Contenedores*
 ![Portainer01](assets/portainer01.PNG)
@@ -363,7 +366,7 @@ Nos conectamos en la consola al contenedor en docker
 
 >$ rs.secondaryOk();
 
->$ use iot;
+>$ use iot; 
 
 >$ db.devices.count();
 
@@ -374,39 +377,102 @@ Verificamos que el número sea igual al número de dispositivos creados en la ap
 ---
 ##  Realizar un ejemplo de Fault Tolerance simulando una caída del Servidor PRIMARY.
 ---
+Empleando el comando *rs.status()* verificamos el estado de los servidores antes de apagar uno.
+
+![nodosUPConsole](assets/nodosUPConsole.PNG)
 
 Usando Portainer vamos a detener el nodo primario para provocar una falla.
 
-Una vez detenido el contenedor vamos a la misma consola anterior y ejecutamos:
+Antes
+![nodosUPDocker](assets/nodosUPDocker.PNG)
 
-> rs.status()
-
-Y buscamos 
+Después
+![nodoDownDocker](assets/nodoDownDocker.PNG)
 
 
 ---
 ##  Explicar que sucedió.
 ---
 
+Al momento en que se apaga uno de los nodos se ejecuta la votación y se selecciona otro nodo como primario, en este caso el que estaba como secundario pasa a ser primario porque el otro nodo está definido como  arbiter por lo que no puede registrar datos y está sólo como votante para definir desempates en casos de haberlos.
+
 ---
 ##  Verificar el estado de cada servidor.
 ---
+
+Para saber el estado de los servidores usamos el comando
+
+> rs.status() 
+
+Paso previo hay que entrar a la consola del nodo que esta levantado y loguearse usando las credenciales:
+
+Observamos el resultado:
+![nodosDownConsole](assets/nodoDownConsole.PNG)
+
+Podemos ver el nodo que está caído, el que estaba secundario pasa a ser primario y está ejecutándose.
+
+
 
 ---
 ##  Insertar un nuevo documento.
 ---
 
+Para insertar un nuevo documento, debemos:
+
+- seleccionar la base de datos:
+
+> uset iot;
+
+- insertamos un documento de prueba en una nueva colección.
+
+> db.testing.insert({value:"hola mundo"});
+
+![newRecordInserted](assets/newRecordInserted.PNG)
+
+Igualmente hacemos la comprobación en compass y verificamos que esté:
+
+![newRecordInsertedCompass](assets/newRecordInsertedCompass.PNG)
+
 ---
 ##  Levantar el servidor caído.
 ---
+
+Hacemos el procedimiento opuesto y levantamos la instancia en portainer
+
+![portainerUpBeforeDown](assets/portainerUpBeforeDown.PNG)
+
+en el log podemos ver el proceso de replicación de datos.
+
+![portainerUpBeforeDownLog](assets/portainerUpBeforeDownLog.PNG)
+
 
 ---
 ##  Validar la información en cada servidor.
 ---
 
+Abrimos otra consola y nos logueamos con el nodo que acabamos de levantar, luego ejecutamos 
+
+>$ rs.secondaryOk();
+
+>$ use iot;
+
+>$  show collections
+
+Deberiamos poder ver las dos colecciones que se crearon en el otro nodo.
+
+![secondaryBeforeRecovery](assets/secondaryBeforeRecovery.PNG)
+
 ---
 ##  Agregar un nuevo nodo con slaveDelay de 120 segundos.
 ---
+
+Por cada nuevo nodo que se agregue se deben crear sus respectivas credenciales TLS y levantar la instancia en mongo, para ello:
+
+- vamos a la carpeta ssl/node_cnf y ejecutamos lo siguiente recordando cambiar XX por el número de nodo a agregar:
+
+> cp nodo01_CN.cnf nodoXX_CN.cpp
+
+
 
 ---
 ##  Ejecutar nuevamente el script facts.js, asegurarse antes de ejecutarlo que el nodo con slaveDelay esté actualizado igual que el PRIMARY.

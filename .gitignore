@@ -116,3 +116,5 @@ dist
 /package-lock.json
 /ssl/prod/serverclient/server_root_CA.pem
 /ssl/dev/serverclient/server_root_CA.pem
+/ssl/client
+/config/serverCluster.conf
