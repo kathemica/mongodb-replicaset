@@ -1,6 +1,0 @@
-subjectKeyIdentifier = hash
-basicConstraints     = CA:FALSE
-keyUsage             = digitalSignature, keyEncipherment
-subjectAltName       = @alternate_names
-nsComment            = "OpenSSL Generated Certificate"
-extendedKeyUsage = clientAuth, serverAuth

@@ -383,10 +383,12 @@ Empleando el comando *rs.status()* verificamos el estado de los servidores antes
 
 Usando Portainer vamos a detener el nodo primario para provocar una falla.
 
-Antes
+*Antes*
+
 ![nodosUPDocker](assets/nodosUPDocker.PNG)
 
-Después
+*Después*
+
 ![nodoDownDocker](assets/nodoDownDocker.PNG)
 
 
@@ -470,7 +472,70 @@ Por cada nuevo nodo que se agregue se deben crear sus respectivas credenciales T
 
 - vamos a la carpeta ssl/node_cnf y ejecutamos lo siguiente recordando cambiar XX por el número de nodo a agregar:
 
-> cp nodo01_CN.cnf nodoXX_CN.cpp
+> cp node_cnf/nodoXX.cnf node_cnf/nodoXX_CN.cnf
+
+Editamos el commonName que está en la sección server_distinguished_name, colocamos el nombre del nuevo nodo a agregar
+
+> nano node_cnf/nodoXX_CN.cnf
+
+Luego vamos vamos a la carpeta ssl y le damos permiso de ejecutación al script addNode.sh
+
+> sudo chmod 775 addNode.sh
+
+Despues editamos el nombre del archivo de configuracion en la linea 11
+
+>nano nodoXX_CN.cnf
+
+Cambiamos 
+
+```
+"${CONFS_FILES_DIR}nodo_XX.cnf" <-- XX por el numero del nodo
+
+```
+
+Finalmente lo ejecutamos
+
+.- Primer parámetro el nombre del nuevo nodo
+
+.- Segundo parámetro la clave del certificado CA
+
+> source ./addNode.sh node_03 b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS
+
+Esos nos crea una nueva carpeta con el nombre del nuevo nodo y los respectivos certificados
+
+Ahora agregamos el contenedor en Docker, 
+
+Primero creamos la carpeta de datos en la carpeta data, para ellos vamos a la raíz del proyecto y ejecutamos:
+
+*NOTA: replicaXX es el nombre de la carpeta data del nuevo nodo, cambie el nombre*
+
+> mkdir data/replicaXX
+
+Luego cambie los parámetros del siguiente código según comop se muestra:
+
+--name por el nombre del contenedor
+-p recuerda ajustar el puerto para que siga la secuencia o al menos no coincida con alguno ya ocupado, cambia XX
+--v replicaXX por el nombre de la carpeta data
+--v NODO_XX por el nombre del nodo donde estan los certificados
+
+```
+ sudo docker run --name MGDB_replicaXX \
+-p 270XX:27017 \
+--restart always \
+-e "TZ=America/Argentina/Buenos_Aires" \
+-e MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=1' \
+-v $(pwd)/data/replicaXX:/data/db \
+-v $(pwd)/ssl/NODO_XX:/data/ssl \
+-v $(pwd)/config:/data/config \
+-e MONGO_INITDB_ROOT_USERNAME=mdb_admin \
+-e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \
+mongo:4.4.4-bionic \
+mongod --config /data/config/serverCluster.conf
+```
+
+Finalmente lo ejecutamos en la consola.
+
+Luego tenemos que entrar al replicaset para configurar el nuevo nodo
 
 
 

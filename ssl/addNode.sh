@@ -8,7 +8,7 @@ NodeXX_DIR=$1
 NodeXX_KEY="${NodeXX_DIR}.key"
 NodeXX_CSR="${NodeXX_DIR}.csr"
 NodeXX_CRT="${NodeXX_DIR}.crt"
-NodeXX_CNF="${CONFS_FILES_DIR}node_base.cnf"
+NodeXX_CNF="${CONFS_FILES_DIR}nodo_XX.cnf"
 
 #-------------------------------------------------------------------
 # las rutas de los certificados generados deben coincidir en el archivo serverCluster
