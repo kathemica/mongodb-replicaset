@@ -470,7 +470,7 @@ Deberiamos poder ver las dos colecciones que se crearon en el otro nodo.
 
 Por cada nuevo nodo que se agregue se deben crear sus respectivas credenciales TLS y levantar la instancia en mongo, para ello:
 
-- vamos a la carpeta ssl/node_cnf y ejecutamos lo siguiente recordando cambiar ZZ por el número de nodo a agregar:
+- vamos a la carpeta *ssl/node_cnf* y ejecutamos lo siguiente recordando cambiar *ZZ* por el número de nodo a agregar:
 
 > cp node_cnf/nodoXX_CN.cnf node_cnf/nodoZZ_CN.cnf
 
@@ -478,21 +478,19 @@ Editamos el commonName que está en la sección server_distinguished_name, coloc
 
 > nano node_cnf/nodoZZ_CN.cnf
 
-Luego vamos vamos a la carpeta ssl y le damos permiso de ejecutación al script addNode.sh
-
-> sudo chmod 775 addNode.sh
-
-Finalmente lo ejecutamos
+Finalmente ejecutamos el script de *addNode*
 
 .- Primer parámetro el nombre del nuevo nodo, debe tener formato aaaaNN, tal como el nombre del archivo de configuracion (sin el _CN.cnf):
 
 .- Segundo parámetro la clave del certificado CA
 
-> source ./addNode.sh node_03 b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS
+> source ./addNode.sh nodo03 b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS
 
-Esos nos crea una nueva carpeta con el nombre del nuevo nodo y los respectivos certificados
+Si nos da error de ejecuciótreen entonces vamos a la carpeta ssl y le damos permiso de ejecutación al script addNode.sh
 
-Ahora agregamos el contenedor en Docker, 
+> sudo chmod 775 addNode.sh
+
+Finalmente nos crea una nueva carpeta con el nombre del nuevo nodo y los respectivos certificados. Ahora agregamos el contenedor en Docker: 
 
 Primero creamos la carpeta de datos en la carpeta data, para ellos vamos a la raíz del proyecto y ejecutamos:
 
@@ -502,7 +500,7 @@ Primero creamos la carpeta de datos en la carpeta data, para ellos vamos a la ra
 
 Luego cambie los parámetros del siguiente código según comop se muestra:
 
---name por el nombre del contenedor
+--name por el nombre del contenedor, reemplaza XX por el numero de nodo, este es el tres (03)
 -p recuerda ajustar el puerto para que siga la secuencia o al menos no coincida con alguno ya ocupado, cambia XX (el último era 19)
 --v replicaXX por el nombre de la carpeta data
 --v NODO_XX por el nombre del nodo donde estan los certificados
@@ -521,7 +519,10 @@ Luego cambie los parámetros del siguiente código según comop se muestra:
 mongo:4.4.4-bionic \
 mongod --config /data/config/serverCluster.conf
 ```
+
 Finalmente lo ejecutamos en la consola y esperamos a que termine de cargar en Docker el nuevo nodo, puedes ver su status en el log de portainer.
+
+![portainerNode03.PNG](assets/portainerNode03.PNG)
 
 Luego tenemos que entrar al replicaset para configurar el nuevo nodo:
 
@@ -533,11 +534,14 @@ Luego nos logueamos
 
 >$ mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/server_root_CA.crt --tlsCertificateKeyFilePassword b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --tlsAllowInvalidHostnames
 
-Y ejecutamos
+Y ejecutamos... **Recuerda cambiar XX por el numero de nodo y YY por el nuevo puerto**:
 
-Recuerda cambiar XX por el numero de nodo y YY por el nuevo puerto:
+> rs.add({host:"<IP ADRESS OR NAME>:270YY",priority:0,slaveDelay:120});
 
-> rs.add({host:"MGDB_replicaXX:270YY",priority:0,slaveDelay:120});
+Para este caso es:
+
+> rs.add({host:"10.0.0.12:27020",priority:0,slaveDelay:120});
+
 
 ![addNewRSNode.PNG](assets/addNewRSNode.PNG)
 
