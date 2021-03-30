@@ -20,10 +20,13 @@
 Autor
 * Ing. Katherine E. Aguirre
 <br>
+
 Haz click a continuación para ver el video tutorial.
+
 <a href="https://youtu.be/oz4PM7ZyXNM
 " target="_blank"><img src="https://i9.ytimg.com/vi/oz4PM7ZyXNM/mq1.jpg?sqp=CIzBjoMG&rs=AOn4CLAhSI6VgHJaEmkWTncGT403-LQC7Q" 
 alt="Video tutorial" width="320" border="10" /></a>
+
 <br>
 <p><i class="fas fa-exclamation-triangle" style="color:#ff9900"></i>&nbsp;&nbsp;Advertencia:</p>
 
