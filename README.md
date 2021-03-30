@@ -16,7 +16,7 @@
 
 ![header](assets/header.png)
 ---
-# FIUBA - MongoDB replicaset con tres (03) nodos y TLS
+# FIUBA - MongoDB replicaset con cuatro (04) nodos y TLS
 Autor
 * Ing. Katherine E. Aguirre
 <br>
@@ -30,7 +30,7 @@ Se hacen las siguientes presunciones:
 
 ---
 
-## Implementar en MongoDB un ReplicaSet con 3 servidores que contengan la información de la BD Finanzas. Un nodo Primary, un secondary y un arbiter.<br>
+## Implementar en MongoDB un ReplicaSet con 4 servidores que contengan la información de la BD Finanzas. Un nodo Primary, un secondary y un arbiter. Finalmente un nodo secondary con delay de 120s<br>
 ---
 
 Esta implementación se realizará con Docker Run, de esta manera quedarán los volúmenes corriendo de una vez, ahora procederemos:
@@ -545,15 +545,116 @@ Para este caso es:
 
 ![addNewRSNode.PNG](assets/addNewRSNode.PNG)
 
+Luego al consultar el detalle del archivo de configuracion
+
+> rs.config()
+
+![slaveDelayInfo.PNG](assets/slaveDelayInfo.PNG)
+
 
 ---
-##  Ejecutar nuevamente el script facts.js, asegurarse antes de ejecutarlo que el nodo con slaveDelay esté actualizado igual que el PRIMARY.
+##  Ejecutar una nueva carga de datos, asegurarse antes de ejecutarlo que el nodo con slaveDelay esté actualizado igual que el PRIMARY.
 ---
 
----
-##  Luego de ejecutado chequear el SECONDARY.
----
+Una vez creado el nuevo nodo debemos esperar que pasen 2 minutos y consultar:
+
+Entramos al nodo03
+
+>$ docker exec -it MGDB_replica03 /bin/bash
+
+Luego nos logueamos
+
+>$ mongo --tls --tlsCertificateKeyFile /data/ssl/mdb_nodes_keycert.pem --tlsCAFile /data/ssl/server_root_CA.crt --tlsCertificateKeyFilePassword b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --tlsAllowInvalidHostnames
+
+> rs.secondaryOk();
+
+> show dbs;
+
+Acá deberiamos ver la base de datos IoT creada, entramos a ella y consultamos las collections:
+
+> show collections
+
+tendriamos que poder las dos colections que posee *iot*
+
+Ahora vamos a una consola y nos situamos en el root del proyecto, ejecutamos nuevamente una carga de datos para generar mas registros
+
+> node app
+
+Esta vez consultaremos un registro de la DB que deberia tener tantas lecturas como ejecuciones hayamos hecho de la app de node
+
+```
+db.devices.aggregate([
+  { $match: {deviceId: 1029384756}},
+  {"$unwind": "$lectures"}, 
+  { $group: {
+        _id: {
+            deviceId: "$deviceId",
+            sensor: "$sensor"
+        },
+        lectures: { $push: "$lectures" },count : { $sum : 1 }
+    }
+}])
+```
+
+Nos debería dar este resultado:
+
+```
+[ { _id: { deviceId: 1029384756, sensor: 'SensorHT' },
+    lectures: 
+     [ { temperature: 
+          { timestamp: 2021-03-30T02:48:41.737Z,
+            value: 10.192585737609974 },
+         humidity: { timestamp: 2021-03-30T02:48:41.737Z, value: 45 } },
+       { temperature: 
+          { timestamp: 2021-03-30T02:48:58.296Z,
+            value: 29.761273726645364 },
+         humidity: { timestamp: 2021-03-30T02:48:58.296Z, value: 97 } },
+       { temperature: 
+          { timestamp: 2021-03-30T02:49:28.473Z,
+            value: -0.864591605113251 },
+         humidity: { timestamp: 2021-03-30T02:49:28.473Z, value: 60 } },
+       { temperature: 
+          { timestamp: 2021-03-30T03:27:00.015Z,
+            value: 12.70649965731462 },
+         humidity: { timestamp: 2021-03-30T03:27:00.015Z, value: 54 } } ],
+    count: 4 } ]
+```
+
+Nótese que count es 4, es la cantidad de ejecuciones que hicimos por lo que el nuevo nodo ya está actualizado.
+
 
 ---
-##  Consultar el nuevo nodo y ver cuando se actualizan los datos.
+##  Luego de ejecutado chequear el SECONDARY y Consultar el nuevo nodo y ver cuando se actualizan los datos.
 ---
+
+El secondary muestra inmediatamente el nuevo registro luego de hacer una insercion, cosa que no pasa con el que está con el delay de 120 que lo hace luego de 2 minutos.
+
+---
+## **Comandos útiles**
+---
+
+Monstrar el estado del RS
+> rs.status();
+
+Mostrar la informacion del archivo de configuración del RS
+> rs.conf();
+
+Mostrar la información de como se maneja la replicacion:
+> rs.printReplicationInfo();
+
+Obtener el detalle de la replicacion:
+> db.getReplicationInfo();
+
+Mostrar las bases de datos:
+> show dbs
+
+Seleccionar una base de datos
+>use <dbname>
+
+Mostrar las colecciones de una base de datos
+
+>show collections
+
+Y consultamos la de *devices*
+
+> db.devices.count();
