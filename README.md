@@ -62,29 +62,18 @@ $ sudo rm -r mongodb-replicaset/ssl/scripts
 $ sudo chmod 755 mongodb-replicaset/ssl/generateCertificates.sh
 ```
 
-4. Una vez hecho esto debemos seleccionar el archivo de configuración, para esto ejecutaremos:
+4. Una vez hecho esto debemos actualizar el archivo de configuración, para esto ejecutaremos:
 ```
-$ sudo mv mongodb-replicaset/config/serverCluster.prod.conf mongodb-replicaset/config/serverCluster.conf
-```
-**NOTA: dependiendo del ambiente renombra a sólo *.conf* bien sea *.dev.conf* ó *prod.conf*** 
-
-
-Igualmente procedemos a borrar lo que nos sobra:
-
-```
-$ sudo rm -r mongodb-replicaset/config/serverCluster.dev.conf
+$ sudo nano config/serverCluster.conf
 ```
 
-Al final de todas estas operaciones nos debería quedar la siguiente estructura:
+Insertamos los valores que indican *<INSERT YOUR KEY HERE>* tanto para la clave del certificado como para el del cluster.
 
-<img src="assets/treeFinal.PNG" width="350">
-
-**NOTA Nro 2: editar el archivo para insertar las claves que faltan**
 
 5. Luego ejecutamos el script para generar los certificados, navegamos hasta la carpeta ssl y ejecutamos el script:
 > cd mongodb-replicaset/ssl/
 
-> ./generateCertificates.sh
+> ./generateCertificates.sh <CA Key> <Cluster Key>
 
 Luego de ejecutar el script nos queda la siguiente estructura:
 
@@ -148,12 +137,12 @@ mongod --config /data/config/serverCluster.conf
 
 >**NOTA: editar el archivo *config/serverCluster.conf* para insertar las claves que faltan antes de ejecutar el script (deben ser las que ya hayas seleccionado).**
 
->sh config.sh `<dev>|<prod>` <CERT_PASS> <CLUSTER_PASS> <MONGO_USER> <MONGO_PASS>
+>sh config.sh `<dev>|<prod>` <CERT_PASS> <CLUSTER_PASS>
 
 Dependiendo del ambiente selecciona *dev* ó *prod*, seguido de la password del certificado CA
 
 I.e:
-> source ./config.sh dev b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS UEdPIiwiZmFsbGJhY mdb_admin mdb_pass
+> source ./config.sh dev b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS UEdPIiwiZmFsbGJhY
 
 *Este script ejecuta todos los pasos previos y deja el ambiente listo para configurar con los pasos que siguen.*
 
