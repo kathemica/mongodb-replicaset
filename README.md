@@ -79,6 +79,8 @@ Al final de todas estas operaciones nos debería quedar la siguiente estructura:
 
 <img src="assets/treeFinal.PNG" width="350">
 
+**NOTA Nro 2: editar el archivo para insertar las claves que faltan**
+
 5. Luego ejecutamos el script para generar los certificados, navegamos hasta la carpeta ssl y ejecutamos el script:
 > cd mongodb-replicaset/ssl/
 
@@ -143,6 +145,8 @@ mongod --config /data/config/serverCluster.conf
 ```
 ---
 **NOTA: HASTA ACÁ TODOS LOS PASOS PREVIOS SE PUEDEN AHORRAR EJECUTANDO:**
+
+>**NOTA: editar el archivo *config/serverCluster.conf* para insertar las claves que faltan antes de ejecutar el script (deben ser las que ya hayas seleccionado).**
 
 >sh config.sh `<dev>|<prod>` <CERT_PASS> <CLUSTER_PASS> <MONGO_USER> <MONGO_PASS>
 
