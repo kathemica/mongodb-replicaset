@@ -3,8 +3,8 @@ clear
 echo "Ambiente: $1";
 echo "CA Pass: $2";
 echo "Cluster Pass: $3";
-# echo "Mongo User: $4";
-# echo "Mongo Pass: $5";
+echo "Mongo User: $4";
+echo "Mongo Pass: $5";
 
 #-------------------------------------------------------------------------------------------------
 printf "\n"
@@ -57,8 +57,8 @@ docker run --name MGDB_replica01 \
 -v $(pwd)/data/replica01:/data/db \
 -v $(pwd)/ssl/nodo01:/data/ssl \
 -v $(pwd)/config:/data/config \
--e MONGO_INITDB_ROOT_USERNAME=<INSERT YOUR USERNAME HERE> \
--e MONGO_INITDB_ROOT_PASSWORD=<INSERT YOUR KEY HERE> \
+-e MONGO_INITDB_ROOT_USERNAME=$4 \
+-e MONGO_INITDB_ROOT_PASSWORD=$5 \
 mongo:4.4.6-bionic \
 mongod --config /data/config/serverCluster.conf
 
@@ -73,8 +73,8 @@ sudo docker run --name MGDB_replica02 \
 -v $(pwd)/data/replica02:/data/db \
 -v $(pwd)/ssl/nodo02:/data/ssl \
 -v $(pwd)/config:/data/config \
--e MONGO_INITDB_ROOT_USERNAME=<INSERT YOUR USERNAME HERE> \
--e MONGO_INITDB_ROOT_PASSWORD=<INSERT YOUR KEY HERE> \
+-e MONGO_INITDB_ROOT_USERNAME=$4 \
+-e MONGO_INITDB_ROOT_PASSWORD=$5 \
 mongo:4.4.6-bionic \
 mongod --config /data/config/serverCluster.conf
 
@@ -89,8 +89,8 @@ sudo docker run --name MGDB_replicaArbiter \
 -v $(pwd)/data/replicaarbiter:/data/db \
 -v $(pwd)/ssl/nodo_arbiter:/data/ssl \
 -v $(pwd)/config:/data/config \
--e MONGO_INITDB_ROOT_USERNAME=<INSERT YOUR USERNAME HERE> \
--e MONGO_INITDB_ROOT_PASSWORD=<INSERT YOUR KEY HERE> \
+-e MONGO_INITDB_ROOT_USERNAME=$4 \
+-e MONGO_INITDB_ROOT_PASSWORD=$5 \
 mongo:4.4.6-bionic \
 mongod --config /data/config/serverCluster.conf
 
