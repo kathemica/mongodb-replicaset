@@ -34,7 +34,7 @@ Server_CRT="server_root_CA.crt"
 Server_SRL="server_root_CA.srl"
 Server_CNF="${CONFS_FILES_DIR}server_root_CA.cnf"
 PASS_PHRASE_CA=$1
-CLUSTER_PHRASE_CA="QzzuGEjsCOURNO7xCeZyCX"
+CLUSTER_PHRASE_CA=$2
 
 #-------------------------------------------------------------------
 # las rutas de los certificados generados deben coincidir en el archivo serverCluster

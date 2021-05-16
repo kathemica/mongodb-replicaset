@@ -144,12 +144,12 @@ mongod --config /data/config/serverCluster.conf
 ---
 **NOTA: HASTA ACÁ TODOS LOS PASOS PREVIOS SE PUEDEN AHORRAR EJECUTANDO:**
 
->sh config.sh `<dev>|<prod>` <CERT_PASS>
+>sh config.sh `<dev>|<prod>` <CERT_PASS> <CLUSTER_PASS> <MONGO_USER> <MONGO_PASS>
 
 Dependiendo del ambiente selecciona *dev* ó *prod*, seguido de la password del certificado CA
 
 I.e:
-> source ./config.sh dev b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS
+> source ./config.sh dev b2RlIjoiUEdPIiwiZmFsbGJhY2tEYXRlIjoiMjAyMS UEdPIiwiZmFsbGJhY mdb_admin mdb_pass
 
 *Este script ejecuta todos los pasos previos y deja el ambiente listo para configurar con los pasos que siguen.*
 
