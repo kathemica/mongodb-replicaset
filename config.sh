@@ -3,8 +3,6 @@ clear
 echo "Ambiente: $1";
 echo "CA Pass: $2";
 echo "Cluster Pass: $3";
-# echo "Mongo User: $4";
-# echo "Mongo Pass: $5";
 
 #-------------------------------------------------------------------------------------------------
 printf "\n"
