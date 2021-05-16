@@ -1,6 +1,8 @@
 #!/bin/sh
 TXT_LOG=" ----- "
 CONFS_FILES_DIR="./node_cnf/"
+echo "CA Pass: $1"
+echo "Cluster Pass: $2"
 
 #-------------------------------------------------------------------
 # las rutas de los certificados generados deben coincidir en el archivo serverCluster
