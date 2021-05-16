@@ -13,10 +13,11 @@ prompt = no
 countryName         = AR
 stateOrProvinceName         = Buenos Aires
 localityName                = Buenos Aires Capital Federal
-organizationName            = kathevigs
-commonName         = XXXXXXXXCHANGE_NAME_HEREXXXXXXXXX
+organizationName            = IT
+commonName         = kathevigs
 emailAddress = kathesama@gmail.com
 ####################################################################
+
 [ server_req_extensions ]
 subjectKeyIdentifier = hash
 basicConstraints     = CA:FALSE
