@@ -1,8 +1,6 @@
 #!/bin/sh
 TXT_LOG=" ----- "
 CONFS_FILES_DIR="./node_cnf/"
-echo "CA Pass: $1"
-echo "Cluster Pass: $2"
 
 #-------------------------------------------------------------------
 # las rutas de los certificados generados deben coincidir en el archivo serverCluster
@@ -36,7 +34,7 @@ Server_CRT="server_root_CA.crt"
 Server_SRL="server_root_CA.srl"
 Server_CNF="${CONFS_FILES_DIR}server_root_CA.cnf"
 PASS_PHRASE_CA=$1
-CLUSTER_PHRASE_CA=$2
+CLUSTER_PHRASE_CA="QzzuGEjsCOURNO7xCeZyCX"
 
 #-------------------------------------------------------------------
 # las rutas de los certificados generados deben coincidir en el archivo serverCluster
@@ -144,4 +142,4 @@ move_files $Server_DIR $Server_KEY
 move_files $Server_DIR $Server_CRT
 move_files $Server_DIR $Server_SRL
 
-printf "FINALIZADO $1 $2 $TXT_LOG \n"
+printf "FINALIZADO $1 $TXT_LOG \n"

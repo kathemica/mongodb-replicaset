@@ -38,7 +38,7 @@ cd ssl/
 #-------------------------------------------------------------------------------------------------
 printf '\e[1;32m%-6s\e[m' "5 Generando certificados..."
 printf "\n" 
-sh generateCertificates.sh $2 $3
+sh generateCertificates.sh $2
 cd ..
 
 #-------------------------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ docker run --name MGDB_replica01 \
 -v $(pwd)/ssl/nodo01:/data/ssl \
 -v $(pwd)/config:/data/config \
 -e MONGO_INITDB_ROOT_USERNAME=mdb_admin \
--e MONGO_INITDB_ROOT_PASSWORD=FJKicJSu8iEOpfoafwJI \
+-e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \
 mongo:4.4.6-bionic \
 mongod --config /data/config/serverCluster.conf
 
@@ -74,7 +74,7 @@ sudo docker run --name MGDB_replica02 \
 -v $(pwd)/ssl/nodo02:/data/ssl \
 -v $(pwd)/config:/data/config \
 -e MONGO_INITDB_ROOT_USERNAME=mdb_admin \
--e MONGO_INITDB_ROOT_PASSWORD=FJKicJSu8iEOpfoafwJI \
+-e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \
 mongo:4.4.6-bionic \
 mongod --config /data/config/serverCluster.conf
 
@@ -90,7 +90,7 @@ sudo docker run --name MGDB_replicaArbiter \
 -v $(pwd)/ssl/nodo_arbiter:/data/ssl \
 -v $(pwd)/config:/data/config \
 -e MONGO_INITDB_ROOT_USERNAME=mdb_admin \
--e MONGO_INITDB_ROOT_PASSWORD=FJKicJSu8iEOpfoafwJI \
+-e MONGO_INITDB_ROOT_PASSWORD=mdb_pass \
 mongo:4.4.6-bionic \
 mongod --config /data/config/serverCluster.conf
 
